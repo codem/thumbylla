@@ -1,0 +1,8 @@
+---
+Name: thumbor_config
+After:
+  - 'framework/*'
+  - 'cms/*'
+---
+:
+  redirect_to_admin: true

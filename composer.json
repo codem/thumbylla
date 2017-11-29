@@ -1,0 +1,22 @@
+{
+	"name": "dpc/mincor",
+	"description": "Thumbor integration for Silverstripe assets",
+	"type": "silverstripe-module",
+	"keywords": [
+		"silverstripe",
+		"thumbor",
+		"responsive"
+	],
+	"homepage": "",
+	"license": "",
+	"authors": [{
+		"name": "James Ellis",
+		"email": "james.ellis@dpc.nsw.gov.au"
+	}],
+	"extra": {
+		"installer-name": "thumbor"
+	},
+	"require": {
+		"99designs/phumbor" : "!1.2"
+	},
+}

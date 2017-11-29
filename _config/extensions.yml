@@ -1,0 +1,9 @@
+---
+Name: thumbor_extensions
+After:
+  - 'framework/*'
+  - 'cms/*'
+---
+Image:
+  extensions:
+    - 'SilverThumb\Image'
