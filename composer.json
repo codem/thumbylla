@@ -17,6 +17,6 @@
 		"installer-name": "thumbor"
 	},
 	"require": {
-		"99designs/phumbor" : "!1.2"
+		"99designs/phumbor" : "~1.2"
 	},
 }

@@ -1,8 +1,19 @@
 ---
 Name: thumbor_config
-After:
-  - 'framework/*'
-  - 'cms/*'
 ---
-:
-  redirect_to_admin: true
+# use our image class
+Injector:
+  Image:
+    class: 'Codem\Thumbor\Image'
+# store config for creating tags
+Codem\Thumbor\Config:
+  # from /etc/thumbor/thumbor.conf
+  thumbor_generation_key: 'a_secret_key'
+  backend_protocol_https : true
+  # if serving off a directory
+  backend_path : ''
+  # list all backends here, as many as you want
+  backends:
+    - 'cdn1.example.com'
+#Codem\Thumbor\Image:
+#Codem\Thumbor\Image_Backend:

@@ -6,4 +6,4 @@ After:
 ---
 Image:
   extensions:
-    - 'SilverThumb\Image'
+    - 'Codem\Thumbor\ImageExtension'
