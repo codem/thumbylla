@@ -7,8 +7,8 @@ Injector:
     class: 'Codem\Thumbor\Image'
 # store config for creating tags
 Codem\Thumbor\Config:
-  # from /etc/thumbor/thumbor.conf
-  thumbor_generation_key: 'a_secret_key'
+  # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY)
+  thumbor_generation_key: 'MY_SECURE_KEY'
   backend_protocol_https : true
   # if serving off a directory
   backend_path : ''
