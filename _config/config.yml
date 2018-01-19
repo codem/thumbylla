@@ -5,15 +5,15 @@ Name: thumbor_config
 Injector:
   Image:
     class: 'Codem\Thumbor\Image'
-# store config for creating tags
+# Example config for creating images
 Codem\Thumbor\Config:
-  # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY)
-  thumbor_generation_key: 'MY_SECURE_KEY'
-  backend_protocol_https : true
+  # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
+  # thumbor_generation_key: 'MY_SECURE_KEY'
+  # backend_protocol_https : false
   # if serving off a directory
-  backend_path : ''
+  # backend_path : ''
   # list all backends here, as many as you want
-  backends:
-    - 'cdn1.example.com'
+  # backends:
+  #  - 'cdn1.example.com'
 #Codem\Thumbor\Image:
 #Codem\Thumbor\Image_Backend:
