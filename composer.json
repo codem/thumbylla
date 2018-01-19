@@ -18,5 +18,5 @@
 	},
 	"require": {
 		"99designs/phumbor" : "~1.2"
-	},
+	}
 }
