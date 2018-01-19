@@ -1,5 +1,5 @@
 {
-	"name": "dpc/mincor",
+	"name": "silverstripe/thumbor",
 	"description": "Thumbor integration for Silverstripe assets",
 	"type": "silverstripe-module",
 	"keywords": [
