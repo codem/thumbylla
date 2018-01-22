@@ -171,7 +171,7 @@ class Image extends \Image {
 				break;
 			case 'ScaleHeight':
 			case 'SetHeight':
-				$this->url->resize(0, $args[1]);// e.g 0x300
+				$this->url->resize(0, $args[0]);// e.g 0x300
 				break;
 			case 'CroppedImage':// ->Fill
 			case 'Fill':
