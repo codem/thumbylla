@@ -2,6 +2,7 @@
 namespace Codem\Thumbor;
 /**
  * Represents our 'image' that is returned to templates, in reality it's just going to be used to return the Thumbor Server URL
+ * Some methods are provided here to provide a semblance of compatibility with \Image_Cached but you really want to call those on the original \Image
  * @todo possibly return picture tag, srcset stuff maybe
  */
 class ThumboredImage extends \ViewableData {
@@ -64,10 +65,6 @@ class ThumboredImage extends \ViewableData {
 	public function exists() {
 		return true;
 	}
-	
-	public function getRelativePath() {
-		return $this->getField('Filename');
-	}
 
 	/**
 	 * Prevent creating new tables for the cached record
@@ -87,4 +84,75 @@ class ThumboredImage extends \ViewableData {
 		return false;
 	}
 
+	public function getFilename() {
+		return $this->filename;
+	}
+
+	/**
+	 * Returns the file extension
+	 *
+	 * Note that Thumbor can return webp images with a .jpg extension via it's Format filter, do not rely on the accuracy of this.
+	 */
+	public function getExtension() {
+		return \File::get_file_extension($this->getFilename());
+	}
+	
+	/**
+	 * Gets the image URL
+	 *
+	 * @return string
+	 */
+	public function getURL() {
+		$url = $this->url->build();
+		return $url->__toString();
+	}
+	
+	/**
+	 * Gets the absolute URL (which is the just the URL)
+	 *
+	 * @return string
+	 */
+	public function getAbsoluteURL() {
+		return $this->getURL();
+	}
+	
+	/**
+	 * Does not exist in this context
+	 */
+	public function getFullPath() {
+		return "";
+	}
+	
+	public function getRelativePath() {
+		return "";
+	}
+	
+	/**
+	 * Just an alias function to keep a consistent API with SiteTree
+	 *
+	 * @return string The link to the file
+	 */
+	public function Link() {
+		return $this->getURL();
+	}
+
+	/**
+	 * Just an alias function to keep a consistent API with SiteTree
+	 *
+	 * @return string The relative link to the file
+	 */
+	public function RelativeLink() {
+		return $this->getFilename();
+	}
+
+	/**
+	 * Just an alias function to keep a consistent API with SiteTree
+	 *
+	 * @return string The absolute link to the file
+	 */
+	public function AbsoluteLink() {
+		return $this->getAbsoluteURL();
+	}
+
 }
+
