@@ -281,6 +281,16 @@ class Image extends \Image {
 	public function ScaleWidthFlipHorizontal($width) {
 		return $this->getFormattedImage('ScaleWidthFlipHorizontal', $width);
 	}
+	
+	/**
+	 * Scale image proportionally to fit within the specified bounds, thumbor handles sanity checking
+	 *
+	 * @param integer $width The width to size within
+	 * @param integer $height The height to size within
+	 */
+	public function Fit($width, $height) {
+		return  $this->getFormattedImage('Fit', $width, $height);
+	}
 
 	/**
 	 * We are not generating anything. This exists solely to avoid invoking GD image generation.
