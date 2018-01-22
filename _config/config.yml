@@ -2,11 +2,11 @@
 Name: thumbor_config
 ---
 # use our image class
-Injector:
-  Image:
-    class: 'Codem\Thumbor\Image'
+#Injector:
+#  Image:
+#    class: 'Codem\Thumbor\Image'
 # Example config for creating images
-Codem\Thumbor\Config:
+#Codem\Thumbor\Config:
   # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
   # thumbor_generation_key: 'MY_SECURE_KEY'
   # backend_protocol_https : false
