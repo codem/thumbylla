@@ -17,6 +17,7 @@
 		"installer-name": "thumbor"
 	},
 	"require": {
+		"silverstripe/framework" : "~3.6",
 		"99designs/phumbor" : "~1.2"
 	}
 }
