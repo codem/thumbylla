@@ -171,7 +171,7 @@ class Image extends \Image {
 				break;
 			case 'ScaleHeight':
 			case 'SetHeight':
-				$this->url->resize(0, $args[1]);// e.g 0x300
+				$this->url->resize(0, $args[0]);// e.g 0x300
 				break;
 			case 'CroppedImage':// ->Fill
 			case 'Fill':
@@ -280,6 +280,16 @@ class Image extends \Image {
 	
 	public function ScaleWidthFlipHorizontal($width) {
 		return $this->getFormattedImage('ScaleWidthFlipHorizontal', $width);
+	}
+	
+	/**
+	 * Scale image proportionally to fit within the specified bounds, thumbor handles sanity checking
+	 *
+	 * @param integer $width The width to size within
+	 * @param integer $height The height to size within
+	 */
+	public function Fit($width, $height) {
+		return  $this->getFormattedImage('Fit', $width, $height);
 	}
 
 	/**
