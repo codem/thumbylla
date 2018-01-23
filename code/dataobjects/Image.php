@@ -8,7 +8,7 @@ use Thumbor\Url\Builder As ThumborUrlBuilder;
  */
 class Image extends \Image {
 
-	private static $backend = "Codem\Thumbor\ThumborBackend";
+	private static $backend = "Codem\Thumbor\ImageBackend";
 
 	private $url;
 	

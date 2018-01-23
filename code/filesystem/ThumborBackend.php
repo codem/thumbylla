@@ -5,7 +5,7 @@ namespace Codem\Thumbor;
  * @package silverthumb
  * @subpackage filesystem
  */
-class ImageBackend extends Object implements Image_Backend {
+class ImageBackend extends \Object implements \Image_Backend {
 
 
 	/**
