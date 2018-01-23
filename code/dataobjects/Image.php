@@ -14,6 +14,8 @@ class Image extends \Image {
 	
 	private $halign = "center";
 	private $valign = "middle";
+	
+	private $crop = "";//cropping points for manualy crop, left-top:right-bottom - AxB:CxD
 
 
 	public function __construct($record = null, $isSingleton = false, $model = null) {
@@ -79,16 +81,6 @@ class Image extends \Image {
 	 */
 	public function isHeight($height) {
 		return false;
-	}
-	
-	/**
-	 * Get the dimensions of this Image.
-	 * @param string $dim If this is equal to "string", return the dimensions in string form,
-	 * if it is 0 return the height, if it is 1 return the width.
-	 * @return string|int|null
-	 */
-	public function getDimensions($dim = "string") {
-		return null;
 	}
 	
 	/**
@@ -242,6 +234,7 @@ class Image extends \Image {
 				break;	
 			case 'SetRatioSize'://->Fit
 			case 'Fit':
+			case 'FitMax':
 				// Returns an image scaled proportional, with its greatest diameter scaled to args
 				$this->url->fitIn($args[0], $args[1]);// e.g 300x300
 				break;
@@ -300,6 +293,18 @@ class Image extends \Image {
 	public function Fit($width, $height) {
 		return  $this->getFormattedImage('Fit', $width, $height);
 	}
+	
+	public function FitMax($width, $height) {
+		return  $this->getFormattedImage('FitMax', $width, $height);
+	}
+	
+	/**
+	 * 
+	 * @todo provide a field to allow manual cropping
+	 */
+	public function CroppedFocusedImage($width, $height) {
+		return $this->getFormattedImage('Fill', $width, $height);
+	}
 
 	/**
 	 * We are not generating anything. This exists solely to avoid invoking GD image generation.
@@ -310,3 +315,4 @@ class Image extends \Image {
 
 
 }
+
