@@ -100,9 +100,10 @@ class Image extends \Image {
 	 * @note requires a Thumbor server with smart crop capabilities
 	 * @param boolean $smart
 	 */
-	public function Smart($smart = true) {
+	public function Smart() {
 		$this->UrlInstance();
-		$this->url->smart($smart);
+		$this->halign = $this->valign = "";
+		$this->url->smartCrop(true);
 		return $this;
 	}
 	
@@ -178,9 +179,10 @@ class Image extends \Image {
 			case 'Fill':
 				// generate a cropped image, default from the middle/center of the image
 				// Use Align in template to set crop point
-				$this->url->valign($this->valign)
-									->halign($this->halign)
-									->resize($args[0], $args[1]);// e.g 300x300
+				$this->url->resize($args[0], $args[1]);// e.g 300x300
+				if($this->halign && $this->valign) {
+					$this->url = $this->url->valign($this->valign)->halign($this->halign);
+				}
 				break;
 			case 'CMSThumbnail':// default CMS Thumbnail
 				$this->url->resize($this->stat('cms_thumbnail_width'),$this->stat('cms_thumbnail_height'));// e.g 100x100
