@@ -17,3 +17,13 @@ Name: thumbor_config
   #  - 'cdn1.example.com'
 #Codem\Thumbor\Image:
 #Codem\Thumbor\Image_Backend:
+#---
+#Name: thumbor_mapping_config
+#---
+#File:
+#  class_for_file_extension:
+#    'jpg': 'Codem\Thumbor\Image'
+#    'jpeg': 'Codem\Thumbor\Image'
+#    'gif': 'Codem\Thumbor\Image'
+#    'png': 'Codem\Thumbor\Image'
+#    'webp': 'Codem\Thumbor\Image'

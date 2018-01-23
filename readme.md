@@ -132,3 +132,21 @@ Codem\Thumbor\Config:
     - 'img2.images.domain.extension'
     - 'img3.images.domain.extension'
 ```
+
+## Known Issues
+
+UploadField creates an instance of ```Image``` and then attempts to create the thumbnail post upload as an instance of ```Image_Cached```. In this case the 40px thumbnail image will not display in the upload element.
+
+You can workaround this by enabling the following ```class_for_file_extension``` config in your project YML:
+```
+File:
+  class_for_file_extension:
+    'jpg': 'Codem\Thumbor\Image'
+    'jpeg': 'Codem\Thumbor\Image'
+    'gif': 'Codem\Thumbor\Image'
+    'png': 'Codem\Thumbor\Image'
+    'webp': 'Codem\Thumbor\Image'
+```
+Once enabled, newly uploaded images will have a ClassName of ```Codem\Thumbor\Image```
+
+

@@ -15,6 +15,15 @@ class Image extends \Image {
 	private $halign = "center";
 	private $valign = "middle";
 
+
+	public function __construct($record = null, $isSingleton = false, $model = null) {
+		if(is_string($record)) {
+			// handle UploadField passing a string as record when class_for_file_extension is not overridden
+			$record = null;
+		}
+		parent::__construct($record, $isSingleton, $model);
+	}
+
 	/**
 	 * Based on config, pick a server to serve an image
 	 * @returns string
