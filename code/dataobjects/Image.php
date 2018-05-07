@@ -316,5 +316,21 @@ class Image extends \Image {
 	}
 
 
+	// Predefined social media images
+	
+	private function getSocialProviderConfig($provider) {
+		$config = $this->config()->get('social');
+		return isset($config[ $provider ]) ? $config[ $provider ] : null;
+	}
+	
+	public function Social($provider, $key) {
+		$config = $this->getSocialProviderConfig($provider);
+		if(!empty($config[$key]['width']) && !empty($config[$key]['height'])) {
+			return $this->getFormattedImage('Fill', $config[$key]['width'], $config[$key]['height']);
+		} else {
+			return null;
+		}
+	}
+
 }
 

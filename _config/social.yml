@@ -1,0 +1,138 @@
+---
+Name: thumbor_social_config
+---
+Codem\Thumbor\Image:
+  social:
+    Generic:
+        landscape:
+            width: 1024
+            height: 512
+        vertical:
+            width: 800
+            height: 1200
+        widescreen:
+            width: 2560
+            height: 1440 
+    # Facebook
+    Facebook:
+        cover:
+            width: 851
+            height: 310
+        profile:
+            width: 180
+            height: 180
+        page_cover:
+            width: 820
+            height: 312
+        page_profile:
+            width: 180
+            height: 180
+        group_cover:
+            width: 820
+            height: 428
+        event_cover:
+            width: 500
+            height: 262
+        share_image:
+            width: 1200
+            height: 630
+        share_link:
+            width: 1200
+            height: 630
+        share_image_highlight:
+            width: 1200
+            height: 1800
+    # Twitter
+    Twitter:
+        cover:
+            width: 1500
+            height: 500
+        profile:
+            width: 400
+            height: 400
+        share_image:
+            width: 1024
+            height: 512
+        share_link:
+            width: 520
+            height: 254
+    # Google+
+    GooglePlus:
+        cover:
+            width: 968
+            height: 545
+        profile:
+            width: 250
+            height: 250
+        share_image:
+            width: 502
+            height: 282
+        share_image_highlight:
+            width: 502
+            height: 892
+        share_link:
+            width: 502
+            height: 250
+    # Instagram
+    Instagram:
+        cover:
+            width: 399
+            height: 150
+        profile:
+            width: 150
+            height: 150
+        share_image:
+            width: 1080
+            height: 1080
+        share_square:
+            width: 1080
+            height: 1080
+        share_vertical:
+            width: 1080
+            height: 1350
+        share_horizontal:
+            width: 1080
+            height: 566
+    # Pinterest
+    Pinterest:
+        profile:
+            width: 165
+            height: 165
+        share_image:
+            width: 236
+            height: 420
+        share_image_highlight:
+            width: 600
+            height: 1060
+        thumb_large:
+            width: 220
+            height: 150
+        thumb_small:
+            width: 55
+            height: 55
+    # LinkedIn
+    LinkedIn:
+        cover:
+            width: 1584
+            height: 396
+        profile:
+            width: 400
+            height: 400
+        share_image:
+            width: 520
+            height: 320
+        share_link:
+            width: 520
+            height: 272
+    YouTube:
+        cover:
+            width: 2560
+            height: 1440
+        profile:
+            width: 250
+            height: 250
+    Vimeo:
+        profile:
+            width: 300
+            height: 300
+            
