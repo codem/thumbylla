@@ -19,5 +19,8 @@
 	"require": {
 		"silverstripe/framework" : "~3.6",
 		"99designs/phumbor" : "~1.2"
+	},
+	"require-dev": {
+		"phpunit/phpunit": "^3 || ^4 || ^5"
 	}
 }
