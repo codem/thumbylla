@@ -10,13 +10,15 @@ class Image extends \Image {
 
 	private static $backend = "Codem\Thumbor\ImageBackend";
 
-	private $url;
+	/**
+	 * @var Thumbor\Url\Builder
+	 */
+	private $thumbor_url;
 	
 	private $halign = "center";
 	private $valign = "middle";
 	
 	private $crop = "";//cropping points for manualy crop, left-top:right-bottom - AxB:CxD
-
 
 	public function __construct($record = null, $isSingleton = false, $model = null) {
 		if(is_string($record)) {
@@ -48,7 +50,7 @@ class Image extends \Image {
 	 * Get secret key shared with the thumbor server to generate images. If this is exposed, anyone with it can create images from allowed hosts
 	 * @returns string
 	 */
-	private function getSecretKey() {
+	public function getSecretKey() {
 		return \Config::inst()->get('Codem\Thumbor\Config', 'thumbor_generation_key');
 	}
 
@@ -60,6 +62,25 @@ class Image extends \Image {
 		$secret = $this->getSecretKey();
 		$inst = ThumborUrlBuilder::construct($server, $secret, $this->getAbsoluteURL());
 		return $inst;
+	}
+	
+	/**
+	 * Create an instance of Thumbor\Url\Builder for this image, if it doesn't already exist
+	 * @returns void
+	 */
+	private function UrlInstance() {
+		if(!$this->thumbor_url) {
+			$this->thumbor_url = $this->generateUrlInstance();
+		}
+	}
+
+	/**
+	 * Retrieve the Thumbor\Url\Builder instance for this image, mainly used in tests
+	 * @returns Thumbor\Url\Builder
+	 */
+	public function getUrlInstance() {
+		$this->UrlInstance();
+		return $this->thumbor_url;
 	}
 	
 	/**
@@ -96,14 +117,28 @@ class Image extends \Image {
 	}
 	
 	/**
-	 * Enable Smart Cropping (when true). Smart Crop is off when false if not called or set to false
+	 * @returns string the current horizontal aligment
+	 */
+	public function getHalign() {
+		return $this->halign;
+	}
+	
+	/**
+	 * @returns string the current vertical aligment
+	 */
+	public function getValign() {
+		return $this->valign;
+	}
+	
+	/**
+	 * Enable Smart Cropping on this instance. It cannot be turned off once enabled.
 	 * @note requires a Thumbor server with smart crop capabilities
 	 * @param boolean $smart
 	 */
-	public function Smart() {
+	public function Smart($enabled = true) {
 		$this->UrlInstance();
 		$this->halign = $this->valign = "";
-		$this->url->smartCrop(true);
+		$this->thumbor_url->smartCrop($enabled);
 		return $this;
 	}
 	
@@ -125,14 +160,8 @@ class Image extends \Image {
 	public function Filter() {
 		$this->UrlInstance();
 		$args = func_get_args();
-		call_user_func_array([$this->url, "addFilter"], $args);
+		call_user_func_array([$this->thumbor_url, "addFilter"], $args);
 		return $this;
-	}
-	
-	private function UrlInstance() {
-		if(!$this->url) {
-			$this->url = $this->generateUrlInstance();
-		}
 	}
 
 	/*
@@ -169,80 +198,80 @@ class Image extends \Image {
 		switch($format) {
 			case 'ScaleWidth':
 			case 'SetWidth':
-				$this->url->resize($args[0], 0);// e.g 300x0
+				$this->thumbor_url->resize($args[0], 0);// e.g 300x0
 				break;
 			case 'ScaleHeight':
 			case 'SetHeight':
-				$this->url->resize(0, $args[0]);// e.g 0x300
+				$this->thumbor_url->resize(0, $args[0]);// e.g 0x300
 				break;
 			case 'CroppedImage':// ->Fill
 			case 'Fill':
 				// generate a cropped image, default from the middle/center of the image
 				// Use Align in template to set crop point
-				$this->url->resize($args[0], $args[1]);// e.g 300x300
+				$this->thumbor_url->resize($args[0], $args[1]);// e.g 300x300
 				if($this->halign && $this->valign) {
-					$this->url = $this->url->valign($this->valign)->halign($this->halign);
+					$this->thumbor_url = $this->thumbor_url->valign($this->valign)->halign($this->halign);
 				}
 				break;
 			case 'CMSThumbnail':// default CMS Thumbnail
-				$this->url->resize($this->stat('cms_thumbnail_width'),$this->stat('cms_thumbnail_height'));// e.g 100x100
+				$this->thumbor_url->resize($this->stat('cms_thumbnail_width'),$this->stat('cms_thumbnail_height'));// e.g 100x100
 				break;
 			case 'AssetLibraryPreview':
 			case 'assetlibrarypreview':
-				$this->url->resize($this->stat('asset_preview_width'),$this->stat('asset_preview_height'));// e.g 400x200
+				$this->thumbor_url->resize($this->stat('asset_preview_width'),$this->stat('asset_preview_height'));// e.g 400x200
 				break;
 			case 'AssetLibraryThumbnail':
 			case 'assetlibrarythumbnail':
-				$this->url->resize($this->stat('asset_thumbnail_width'),$this->stat('asset_thumbnail_height'));// e.g 100x100
+				$this->thumbor_url->resize($this->stat('asset_thumbnail_width'),$this->stat('asset_thumbnail_height'));// e.g 100x100
 				break;
 			case 'StripThumbnail':
 			case 'stripthumbnail':
-				$this->url->resize($this->stat('strip_thumbnail_width'),$this->stat('strip_thumbnail_height'));// e.g 50x50
+				$this->thumbor_url->resize($this->stat('strip_thumbnail_width'),$this->stat('strip_thumbnail_height'));// e.g 50x50
 				break;
 			case 'FlipVertical':
 				// flip the original image
-				$this->url->resize(0, '-0');
+				$this->thumbor_url->resize(0, '-0');
 				break;
 			case 'FlipHorizontal':
 				// flip the original image
-				$this->url->resize('-0', 0);
+				$this->thumbor_url->resize('-0', 0);
 				break;
 			case 'ScaleWidthFlipVertical':
 				// scale and flip vertically
-				$this->url->resize($args[0], '-0');
+				$this->thumbor_url->resize($args[0], '-0');
 				break;
 			case 'ScaleWidthFlipHorizontal':
 				// scale and flip horizontally
-				$this->url->resize($args[0] * -1, 0);
+				$this->thumbor_url->resize($args[0] * -1, 0);
 				break;
 			case 'ScaleHeightFlipVertical':
 				// scale and flip vertically
-				$this->url->resize(0, $args[1] * -1);
+				$this->thumbor_url->resize(0, $args[1] * -1);
 				break;
 			case 'ScaleHeightFlipHorizontal':
 				// scale and flip horizontally
-				$this->url->resize('-0', $args[1]);
+				$this->thumbor_url->resize('-0', $args[1]);
 				break;
 			case 'PaddedImage':// ->Pad
 			case 'SetSize':// ->Pad
 			case 'Pad':
 				// a bit like Fill but we Pad out with a specified colour, #fff if not specified
 				$pad_colour = 'fff';
-				$this->url->fitIn($args[0], $args[1]);// e.g 300x300
+				$this->thumbor_url->fitIn($args[0], $args[1]);// e.g 300x300
 				if(!empty($args[2])) {
 					$pad_colour = $args[2];
 				}
-				$this->url = $this->url->addFilter('fill', $pad_colour);
+				$this->thumbor_url = $this->thumbor_url->addFilter('fill', $pad_colour);
 				break;	
 			case 'SetRatioSize'://->Fit
 			case 'Fit':
 			case 'FitMax':
 				// Returns an image scaled proportional, with its greatest diameter scaled to args
-				$this->url->fitIn($args[0], $args[1]);// e.g 300x300
+				$this->thumbor_url->fitIn($args[0], $args[1]);// e.g 300x300
 				break;
 			case 'ResizedImage':
 				// this can result in images that are oddly cropped
-				$this->url->resize($args[0], $args[1]);
+				$this->thumbor_url->resize($args[0], $args[1]);
 				break;
 			default:
 				throw new \Exception("Unhandled format {$format}");
@@ -262,8 +291,8 @@ class Image extends \Image {
 		*/
 		
 		// return an instance that can be used in a template call
-		//var_dump($this->url->build()->__toString());
-		return new ThumboredImage( $this->url, $this->Title, $this->Filename );
+		//var_dump($this->thumbor_url->build()->__toString());
+		return new ThumboredImage( $this->thumbor_url, $this->Title, $this->Filename );
 	}
 	
 	/**
@@ -318,9 +347,9 @@ class Image extends \Image {
 
 	// Predefined social media images
 	
-	private function getSocialProviderConfig($provider) {
+	public function getSocialProviderConfig($provider) {
 		$config = $this->config()->get('social');
-		return isset($config[ $provider ]) ? $config[ $provider ] : null;
+		return isset($config[ $provider ]) && is_array($config[ $provider ]) ? $config[ $provider ] : [];
 	}
 	
 	public function Social($provider, $key) {
@@ -333,4 +362,3 @@ class Image extends \Image {
 	}
 
 }
-
