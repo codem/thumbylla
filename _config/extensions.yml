@@ -4,6 +4,6 @@ After:
   - 'framework/*'
   - 'cms/*'
 ---
-Image:
+File:
   extensions:
     - 'Codem\Thumbor\ImageExtension'

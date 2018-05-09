@@ -149,4 +149,5 @@ File:
 ```
 Once enabled, newly uploaded images will have a ClassName of ```Codem\Thumbor\Image```
 
-
+## Libraries
+This module incorporates cropperjs (lib/cropperjs)

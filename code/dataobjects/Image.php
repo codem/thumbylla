@@ -17,8 +17,6 @@ class Image extends \Image {
 	
 	private $halign = "center";
 	private $valign = "middle";
-	
-	private $crop = "";//cropping points for manualy crop, left-top:right-bottom - AxB:CxD
 
 	public function __construct($record = null, $isSingleton = false, $model = null) {
 		if(is_string($record)) {
@@ -163,6 +161,93 @@ class Image extends \Image {
 		call_user_func_array([$this->thumbor_url, "addFilter"], $args);
 		return $this;
 	}
+	
+	/**
+	 * Shortcut method to crop an image from its edges, e.g 20,20,20,20 crops the image 20 pixels in from each edge
+	 * @param int $in_from_left pixels in from the left edge
+	 * @param int $in_from_top pixels in from the top edge
+	 * @param int $in_from_right pixels in from the right edge
+	 * @param int $in_from_bottom pixels in from the bottom edge
+	 * @todo ensureLocalFile from cdncontent ?
+	 */
+	public function ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom) {
+		
+		$path = $this->getFullPath();
+		if(!is_readable($path)) {
+			return null;
+		}
+		
+		$meta_original = getimagesize( $path );
+		if(empty($meta_original[0]) || empty($meta_original[1])) {
+			return null;
+		}
+		
+		$width = $meta_original[0];
+		$height = $meta_original[1];
+		// calculate the bottom/right/x|y values
+		$bottom_right_x = $width - $in_from_right;
+		$bottom_right_y = $height - $in_from_bottom;
+		
+		$this->UrlInstance();
+		$this->thumbor_url->crop($in_from_left, $in_from_top, $bottom_right_x, $bottom_right_y);
+		return $this;
+	}
+	
+	/**
+	 * Supply focal per http://thumbor.readthedocs.io/en/latest/focal.html, noting this warning: http://thumbor.readthedocs.io/en/latest/focal.html#warning
+	 * @param int $left
+	 * @param int $top
+	 * @param int $right
+	 * @param int $bottom
+	 * Example specifying 100,100,100,100 on an image that is then ScaleWidth(300)
+	 */
+	public function Focal($left, $top, $right, $bottom) {
+		$this->UrlInstance();
+		$this->halign = $this->valign = "";
+		$focal_string = "{$left}x{$top}:{$right}x{$bottom}";
+		$this->thumbor_url = $this->thumbor_url->addFilter('focal', $focal_string);
+		return $this;
+	}
+	
+	/**
+	 * Return a {@link Codem\Thumbor\Image} with a focal filter set based on the date returned from ManualCropData
+	 * @see {@link Codem\Thumbor\ImageExtension}
+	 * @returns Codem\Thumbor\Image
+	 */
+	public function CroppedFocus() {
+		$data = $this->getCropData();
+		if(!empty($data)) {
+			$left = $data['x'];
+			$top = $data['y'];
+			// right =  left + width
+			$right = $left + $data['width'];
+			$bottom = $top + $data['height'];
+			$this->Focal($left, $top, $right, $bottom);
+			return $this;
+		} else {
+			// return the unaltered image if not data is set
+			return $this;
+		}
+	}
+	
+	/**
+	 * Crop the image using Thumbor manual crop handling based on image crop data
+	 * @returns Codem\Thumbor\Image
+	 */
+	public function ManualCrop() {
+		$data = $this->getCropData();
+		if(!empty($data)) {
+			$left = $data['x'];
+			$top = $data['y'];
+			// right =  left + width
+			$right = $left + $data['width'];
+			$bottom = $top + $data['height'];
+			
+			$this->UrlInstance();
+			$this->thumbor_url->crop($left, $top, $right, $bottom);
+		}
+		return $this;
+	}
 
 	/*
 	 * Return a Codem\ThumboredImage object representing the image to be resample/sized by the Thumbor server.
@@ -273,6 +358,9 @@ class Image extends \Image {
 				// this can result in images that are oddly cropped
 				$this->thumbor_url->resize($args[0], $args[1]);
 				break;
+			case 'Original':
+				// handle original case (e.g ManualCrop with no resize)
+				break;
 			default:
 				throw new \Exception("Unhandled format {$format}");
 				break;
@@ -313,6 +401,10 @@ class Image extends \Image {
 	
 	public function ScaleWidthFlipHorizontal($width) {
 		return $this->getFormattedImage('ScaleWidthFlipHorizontal', $width);
+	}
+	
+	public function Original() {
+		return $this->getFormattedImage('Original');
 	}
 	
 	/**

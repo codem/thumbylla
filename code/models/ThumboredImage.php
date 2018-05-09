@@ -117,7 +117,7 @@ class ThumboredImage extends \ViewableData {
 	}
 	
 	/**
-	 * Does not exist in this context
+	 * Does not exist in this context as this resulting transformed image exists at the Thumbor Server 
 	 */
 	public function getFullPath() {
 		return "";
