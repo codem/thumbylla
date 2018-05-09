@@ -2,10 +2,12 @@
 use Codem\Thumbor\ThumboredImage;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
+use Codem\Thumbor\ManualCropField As ManualCropField;
 
 /**
  * Module tests
  * @note 99designs/phumbor provides a number of tests related to URL/Token/Command generation
+ * @todo specify an image to work on for all tests, of known size
  */
 class ThumborTest extends \SapphireTest {
 	
@@ -198,6 +200,65 @@ class ThumborTest extends \SapphireTest {
 		
 		// should end with this command/path
 		$this->assertStringEndsWith("=/{$provider_config['width']}x{$provider_config['height']}/center/middle/{$original_url}", $url);
+	}
+	
+	/**
+	 * Test manual crop from corners
+	 * @todo CroppedFocus crop test
+	 */
+	public function testManualCropFromCorners() {
+		$image = \Image::get()->sort('ID ASC')->first();
+		$this->assertTrue( !empty($image->ID) && $image->exists() );
+		
+		if($image->hasMethod('ensureLocalFile')) {
+			$image->ensureLocalFile();
+		}
+		
+		$original_path = $image->getFullPath();
+		$original_url = $image->getAbsoluteURL();
+		
+		$in_from_left = 20;
+		$in_from_top = 20;
+		$in_from_right = 40;
+		$in_from_bottom = 40;
+		
+		$meta_original = getimagesize($original_path);
+		$width_original = $meta_original[0];
+		$height_original = $meta_original[1];
+		
+		$bottom_right_x = $width_original - $in_from_right;
+		$bottom_right_y = $height_original - $in_from_bottom;
+		
+		$width_thumb = $width_original - $in_from_left - $in_from_right;
+		$height_thumb = $height_original - $in_from_top - $in_from_bottom;
+		
+		$thumb = $image->ManualCropFromCorners($in_from_left,$in_from_top,$in_from_right,$in_from_bottom)->Original();
+		
+		// Get its URL
+		$url = $thumb->getAbsoluteURL();
+		
+		// should end with this command/path
+		$this->assertStringEndsWith("=/{$in_from_left}x{$in_from_top}:{$bottom_right_x}x{$bottom_right_y}/{$original_url}", $url);
+		
+		$meta = getimagesize($url);
+		
+		$this->assertEquals( $meta[0], $width_thumb );// width
+		$this->assertEquals( $meta[1], $height_thumb );// height
+		
+	}
+	
+	/**
+	 * Test that the field returns the expected field
+	 */
+	public function testManualCropField() {
+		$image = \Image::get()->sort('ID ASC')->first();
+		$this->assertTrue( !empty($image->ID) && $image->exists() );
+		
+		$cropper = new ManualCropField( $image );
+		$field = $cropper->getField();
+		
+		$this->assertTrue($field instanceof \CompositeField);
+	
 	}
 	
 }
