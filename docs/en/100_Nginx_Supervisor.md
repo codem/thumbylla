@@ -18,17 +18,17 @@ Install supervisor if not already installed. On Ubuntu you would ```sudo apt ins
 
 ### 3. nginx
 
-Install nginx: https://nginx.org/en/linux_packages.html#stable
-You can use a pre-existing install or have a standalone install.
+Install Nginx in whichever way you want,e.g from https://nginx.org/en/linux_packages.html#stable
+You can use a pre-existing install or have a standalone install. The most important thing is that you have an nginx server accepting requests.
 
-Configuring and tweaking an nginx installation is beyond the scope of this document - there are many resources for this on the web.
+Configuring and tweaking an nginx installation is beyond the scope of this document - there are many, many resources for this on the web.
 
-### Thumbor
+### 4. Thumbor
 
 Install Thumbor using PIP. The Ubuntu PPA is out-of-date at this writing.
 
 ```
-sudo pip install pycurl thumbor
+sudo pip install thumbor pycurl
 ```
 
 ## Configuration
@@ -42,7 +42,7 @@ sudo thumbor-config > /etc/thumbor/thumbor.conf
 
 For the most basic configuration, modify the following values
 
-+ SECURITY_KEY: change this to something random and lengthy, it will be used to generate thumbnails. Anyone who has the key can generate thumbnails and use up storage.
++ SECURITY_KEY: change this to something random and lengthy, it will be used to generate thumbnails. **Anyone who has the key can generate thumbnails and use up storage.**
 + ALLOW_UNSAFE_URL: change to ```False```
 + HTTP_LOADER_DEFAULT_USER_AGENT: you can modify the user agent used to retrieve original files
 + HTTP_LOADER_PROXY_HOST, HTTP_LOADER_PROXY_PORT: modify if you are behind a proxy
@@ -54,7 +54,8 @@ You can tweak other values as required.
 
 ### Supervisor
 
-The following supervisor configuration will start 4 thumbor processes (numprocs=4) on ports 12100 to 12103 ( --port=1210%(process_num)s ).
+> The following supervisor configuration will start 4 thumbor processes (numprocs=4) on ports 12100 to 12103 ( --port=1210%(process_num)s ).
+
 You can use any port range that is free and tweak the number of processes, maybe you only need 1?
 
 ```
@@ -62,13 +63,15 @@ You can use any port range that is free and tweak the number of processes, maybe
 command=thumbor --port=1210%(process_num)s --conf=/etc/thumbor/thumbor.conf
 process_name=thumbor_1210%(process_num)s
 user=username
+# this will start  processes on ports 12100 to 12103
 numprocs=4
+# you can tweak these settings as you see fit
 autostart=true
 autorestart=true
 startretries=3
 ```
 
-Where ```username``` is a user that can write to the FILE_STORAGE_ROOT_PATH
+Where ```username``` is a user that can write to the FILE_STORAGE_ROOT_PATH. It should *not* be root.
 
 Restart supervisor, check for running processes, look in supervisor logs for errors if there are issues.
 
@@ -90,21 +93,23 @@ server {
 	# listen *:80;
 	# basic https config
 	listen *:443 ssl http2;
+	# Basic setup - tweak your SSL/TLS config here
 	ssl_certificate /path/to/crt;
 	ssl_certificate_key /path/to/key;
 
-	# server images off a wildcard domain
-	server_name *.images.domain.extension;
+	# serve images off a wildcard domain
+	server_name *.cdn.example.com;
 
 	# optionally create this root with an index.html
+	# nothing is stored here
 	root /var/www/thumbor;
-	
+
 	# log locations, tweak error log levels as required
 	error_log /path/to/error.log info;
 	access_log /path/to/access.log;
 
 	location / {
-		# pass all requests to the backend
+		# pass all requests to the upstream configured above
 		proxy_pass http://thumbor;
 		# hide the following headers
 		proxy_hide_header WWW-Authenticate;
@@ -136,9 +141,9 @@ server {
 }
 ```
 
-Your ```server_name``` settings are important here, for instance in this setup you could configure your backends to be ```image1.images.domain.extension```, ```image2.images.domain.extension``` and so-forth.
+Your ```server_name``` settings are important here, for instance in this setup you could configure your backends to be ```image1.cdn.example.com```, ```image2.cdn.example.com``` and so-forth.
 
-You could lock down your server names to be strict, for instance ```server_name image1.domain.extension image2.domain.extension```
+You could lock down your server names to be strict, for instance ```server_name image1.cdn.example.com image2.cdn.example.com```
 
 Test your configuration ```sudo nginx -t``` and reload nginx.
 
