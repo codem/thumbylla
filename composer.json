@@ -1,6 +1,6 @@
 {
-	"name": "silverstripe/thumbor",
-	"description": "Thumbor integration for Silverstripe assets",
+	"name": "codem/silverstripe-thumbor",
+	"description": "Thumbylla - a Thumbor integration for Silverstripe image assets",
 	"type": "silverstripe-module",
 	"keywords": [
 		"silverstripe",
@@ -11,7 +11,6 @@
 	"license": "",
 	"authors": [{
 		"name": "James Ellis",
-		"email": "james.ellis@dpc.nsw.gov.au"
 	}],
 	"extra": {
 		"installer-name": "thumbor"
