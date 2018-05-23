@@ -14,7 +14,7 @@ class Image extends \Image {
 	 * @var Thumbor\Url\Builder
 	 */
 	private $thumbor_url;
-	
+
 	private $halign = "center";
 	private $valign = "middle";
 
@@ -31,17 +31,17 @@ class Image extends \Image {
 	 * @returns string
 	 */
 	private function pickServer() {
-		$servers = \Config::inst()->get('Codem\Thumbor\Config', 'backends');
-		if(!$servers || empty($servers) || !is_array($servers)) {
+		$proto = "http://";
+		$backends = \Config::inst()->get('Codem\Thumbor\Config', 'backends');
+		if(!$backends || empty($backends) || !is_array($backends)) {
 			throw new \Exception("No servers defined");
 		}
-		$key = array_rand($servers, 1);
-		$proto_https = \Config::inst()->get('Codem\Thumbor\Config', 'backend_protocol_https');
-		$proto = "http://";
-		if($proto_https) {
+		$use_https = \Config::inst()->get('Codem\Thumbor\Config', 'use_https');
+		if($use_https) {
 			$proto = "https://";
 		}
-		return $proto . $servers[$key];
+		$key = array_rand($backends, 1);
+		return $proto . $backends[$key];
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Image extends \Image {
 		$inst = ThumborUrlBuilder::construct($server, $secret, $this->getAbsoluteURL());
 		return $inst;
 	}
-	
+
 	/**
 	 * Create an instance of Thumbor\Url\Builder for this image, if it doesn't already exist
 	 * @returns void
@@ -80,14 +80,14 @@ class Image extends \Image {
 		$this->UrlInstance();
 		return $this->thumbor_url;
 	}
-	
+
 	/**
 	 * This always returns false to force {@link self::getFormattedImage} to be called
 	 */
 	public function isSize($width, $height) {
 		return false;
 	}
-	
+
 	/**
 	 * This always returns false to force {@link self::getFormattedImage} to be called
 	 */
@@ -101,7 +101,7 @@ class Image extends \Image {
 	public function isHeight($height) {
 		return false;
 	}
-	
+
 	/**
 	 * Align the crop (for Fill/CroppedImage)
 	 * @param string $halign one of center, left, right
@@ -113,21 +113,21 @@ class Image extends \Image {
 		$this->valign = $valign;
 		return $this;
 	}
-	
+
 	/**
 	 * @returns string the current horizontal aligment
 	 */
 	public function getHalign() {
 		return $this->halign;
 	}
-	
+
 	/**
 	 * @returns string the current vertical aligment
 	 */
 	public function getValign() {
 		return $this->valign;
 	}
-	
+
 	/**
 	 * Enable Smart Cropping on this instance. It cannot be turned off once enabled.
 	 * @note requires a Thumbor server with smart crop capabilities
@@ -139,7 +139,7 @@ class Image extends \Image {
 		$this->thumbor_url->smartCrop($enabled);
 		return $this;
 	}
-	
+
 	/**
 	 * Add multiple filters
 	 */
@@ -150,7 +150,7 @@ class Image extends \Image {
 		}
 		return $this;
 	}
-	
+
 	/**
 	 * Add single filter
 	 * @note DOCS: "Filters are affecting each other in the order they are specified"
@@ -161,7 +161,7 @@ class Image extends \Image {
 		call_user_func_array([$this->thumbor_url, "addFilter"], $args);
 		return $this;
 	}
-	
+
 	/**
 	 * Shortcut method to crop an image from its edges, e.g 20,20,20,20 crops the image 20 pixels in from each edge
 	 * @param int $in_from_left pixels in from the left edge
@@ -171,28 +171,28 @@ class Image extends \Image {
 	 * @todo ensureLocalFile from cdncontent ?
 	 */
 	public function ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom) {
-		
+
 		$path = $this->getFullPath();
 		if(!is_readable($path)) {
 			return null;
 		}
-		
+
 		$meta_original = getimagesize( $path );
 		if(empty($meta_original[0]) || empty($meta_original[1])) {
 			return null;
 		}
-		
+
 		$width = $meta_original[0];
 		$height = $meta_original[1];
 		// calculate the bottom/right/x|y values
 		$bottom_right_x = $width - $in_from_right;
 		$bottom_right_y = $height - $in_from_bottom;
-		
+
 		$this->UrlInstance();
 		$this->thumbor_url->crop($in_from_left, $in_from_top, $bottom_right_x, $bottom_right_y);
 		return $this;
 	}
-	
+
 	/**
 	 * Supply focal per http://thumbor.readthedocs.io/en/latest/focal.html, noting this warning: http://thumbor.readthedocs.io/en/latest/focal.html#warning
 	 * @param int $left
@@ -208,7 +208,7 @@ class Image extends \Image {
 		$this->thumbor_url = $this->thumbor_url->addFilter('focal', $focal_string);
 		return $this;
 	}
-	
+
 	/**
 	 * Return a {@link Codem\Thumbor\Image} with a focal filter set based on the date returned from ManualCropData
 	 * @see {@link Codem\Thumbor\ImageExtension}
@@ -229,7 +229,7 @@ class Image extends \Image {
 			return $this;
 		}
 	}
-	
+
 	/**
 	 * Crop the image using Thumbor manual crop handling based on image crop data
 	 * @returns Codem\Thumbor\Image
@@ -242,7 +242,7 @@ class Image extends \Image {
 			// right =  left + width
 			$right = $left + $data['width'];
 			$bottom = $top + $data['height'];
-			
+
 			$this->UrlInstance();
 			$this->thumbor_url->crop($left, $top, $right, $bottom);
 		}
@@ -251,13 +251,13 @@ class Image extends \Image {
 
 	/*
 	 * Return a Codem\ThumboredImage object representing the image to be resample/sized by the Thumbor server.
-		
+
 			From the DOCS:
 			===================
 			Image Endpoint
 
 			http://thumbor-server/hmac/trim/AxB:CxD/fit-in/-Ex-F/HALIGN/VALIGN/smart/filters:FILTERNAME(ARGUMENT):FILTERNAME(ARGUMENT)/image-uri
-			
+
 			* thumbor-server is the address of the service currently running;
 			* hmac is the signature that ensures Security ;
 			* trim removes surrounding space in images using top-left pixel color unless specified otherwise;
@@ -269,7 +269,7 @@ class Image extends \Image {
 			* smart means using smart detection of focal points;
 			* filters can be applied sequentially to the image before returning;
 			* image-uri is the public URI for the image you want resized.
-			
+
 	 *
 	 * Just pass the correct number of parameters expected by the working function
 	 *
@@ -347,7 +347,7 @@ class Image extends \Image {
 					$pad_colour = $args[2];
 				}
 				$this->thumbor_url = $this->thumbor_url->addFilter('fill', $pad_colour);
-				break;	
+				break;
 			case 'SetRatioSize'://->Fit
 			case 'Fit':
 			case 'FitMax':
@@ -365,7 +365,7 @@ class Image extends \Image {
 				throw new \Exception("Unhandled format {$format}");
 				break;
 		}
-		
+
 		/*
 		* @method Builder trim($colourSource = null)
 		* @method Builder crop($topLeftX, $topLeftY, $bottomRightX, $bottomRightY)
@@ -377,36 +377,36 @@ class Image extends \Image {
 		* @method Builder addFilter($filter, $args, $_ = null)
 		* @method Builder metadataOnly($metadataOnly)
 		*/
-		
+
 		// return an instance that can be used in a template call
 		//var_dump($this->thumbor_url->build()->__toString());
 		return new ThumboredImage( $this->thumbor_url, $this->Title, $this->Filename );
 	}
-	
+
 	/**
 	 * Some specific Thumbor image handling
 	 */
-	
+
 	public function FlipVertical() {
 		return $this->getFormattedImage('FlipVertical');
 	}
-	
+
 	public function FlipHorizontal() {
 		return $this->getFormattedImage('FlipHorizontal');
 	}
-	
+
 	public function ScaleWidthFlipVertical($width) {
 		return $this->getFormattedImage('ScaleWidthFlipVertical', $width);
 	}
-	
+
 	public function ScaleWidthFlipHorizontal($width) {
 		return $this->getFormattedImage('ScaleWidthFlipHorizontal', $width);
 	}
-	
+
 	public function Original() {
 		return $this->getFormattedImage('Original');
 	}
-	
+
 	/**
 	 * Scale image proportionally to fit within the specified bounds, thumbor handles sanity checking
 	 *
@@ -416,13 +416,13 @@ class Image extends \Image {
 	public function Fit($width, $height) {
 		return  $this->getFormattedImage('Fit', $width, $height);
 	}
-	
+
 	public function FitMax($width, $height) {
 		return  $this->getFormattedImage('FitMax', $width, $height);
 	}
-	
+
 	/**
-	 * 
+	 *
 	 * @todo provide a field to allow manual cropping
 	 */
 	public function CroppedFocusedImage($width, $height) {
@@ -438,12 +438,12 @@ class Image extends \Image {
 
 
 	// Predefined social media images
-	
+
 	public function getSocialProviderConfig($provider) {
 		$config = $this->config()->get('social');
 		return isset($config[ $provider ]) && is_array($config[ $provider ]) ? $config[ $provider ] : [];
 	}
-	
+
 	public function Social($provider, $key) {
 		$config = $this->getSocialProviderConfig($provider);
 		if(!empty($config[$key]['width']) && !empty($config[$key]['height'])) {
