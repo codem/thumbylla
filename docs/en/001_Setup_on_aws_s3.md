@@ -1,25 +1,27 @@
 # Setup on AWS S3
 
-S3 is a great choice for result storage and/or storage.
+S3 is a great choice for result storage and/or storage, allowing you to store generated thumbnails outside a Silverstripe website's assets directory.
 
-You will need to install the (Thumbor Community AWS extension)[https://github.com/thumbor-community/aws] which can be done via PIP:
+You will need to install the [Thumbor Community AWS extension](https://github.com/thumbor-community/aws) which can be done via PIP:
 ```
 sudo pip install tc_aws
 ```
 
 The AWS extension supports an S3 Loading bucket, a storage bucket and a result storage bucket.
-S3 communications are handle via ```boto`` and your AWS credentials can be stored in the standard places:
-e.g in ~/.aws/credentials
+
+S3 communications [are handled via boto](http://boto3.readthedocs.io/en/latest/guide/configuration.html) and your AWS credentials can be stored in the standard places, such as ~/.aws/credentials:
 ```
 [default]
 aws_secret_access_key=xxxxxxxxxxxxxxxxxxxxx
 aws_access_key_id=aaaaaaaaaaaaaaaaaaa
 ```
 
-If you load images from multiple locations but want to store them within your AWS S3 buckets, a good setup options is the following
+## Sample setup
+
+If you load images from multiple locations but want to store them within your AWS S3 buckets, a good setup options is the following:
 ### Example thumbor.conf
 ```
-# load images using the standard loader
+# load images using the HTTP loader
 LOADER = 'thumbor.loaders.http_loader'
 # store images in S3 storage
 STORAGE = 'tc_aws.storages.s3_storage
@@ -60,5 +62,4 @@ TC_AWS_STORAGE_SSE=False
 TC_AWS_STORAGE_RRS=False
 ```
 
-This setup will store your images and thumbnail results in S3.
-Note that you can't serve up thumbnails directly from S3 unless you first check that the image exists, which is slow and cumbersome.
+> This setup will store your images and thumbnail results in S3. Images will be served from your configured Thumbor server names.
