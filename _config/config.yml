@@ -9,7 +9,7 @@ Name: thumbor_config
 #Codem\Thumbor\Config:
   # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
   # thumbor_generation_key: 'MY_SECURE_KEY'
-  # backend_protocol_https : false
+  # use_https : true
   # if serving off a directory
   # backend_path : ''
   # list all backends here, as many as you want
