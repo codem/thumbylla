@@ -3,12 +3,17 @@ use Codem\Thumbor\ThumboredImage;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
 use Codem\Thumbor\ManualCropField As ManualCropField;
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Core\Config;
+use SilverStripe\Assets\Image;
+use SilverStripe\Control\Director;
+use SilverStripe\Forms\CompositeField;
 
 /**
  * Module tests
  * @note 99designs/phumbor provides a number of tests related to URL/Token/Command generation
  */
-class ThumborTest extends \SapphireTest {
+class ThumborTest extends SapphireTest {
 
 	const WIDTH = 474;
 	const HEIGHT = 320;
@@ -55,7 +60,7 @@ class ThumborTest extends \SapphireTest {
 	}
 
 	private function unlinkSampleImage() {
-		if($this->image instanceof \Image) {
+		if($this->image instanceof Image) {
 			$this->image->delete();
 		}
 	}
@@ -311,7 +316,7 @@ class ThumborTest extends \SapphireTest {
 		$cropper = new ManualCropField( $image );
 		$field = $cropper->getField();
 
-		$this->assertTrue($field instanceof \CompositeField);
+		$this->assertTrue($field instanceof CompositeField);
 
 	}
 

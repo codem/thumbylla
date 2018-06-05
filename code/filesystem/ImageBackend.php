@@ -65,7 +65,7 @@ class ImageBackend extends \Object implements \Image_Backend {
 	 * @return Image_Backend
 	 */
 	public function resize($width, $height)  {
-		
+
 	}
 
 	/**

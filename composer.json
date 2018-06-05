@@ -13,10 +13,10 @@
 		"name": "James Ellis",
 	}],
 	"extra": {
-		"installer-name": "thumbor"
+		"installer-name": "thumbylla"
 	},
 	"require": {
-		"silverstripe/framework" : "~3.6",
+		"silverstripe/framework" : "~4.0",
 		"99designs/phumbor" : "~1.2"
 	},
 	"require-dev": {
