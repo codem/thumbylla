@@ -1,9 +1,11 @@
 <?php
 namespace Codem\Thumbor;
 use SilverStripe\Assets\Image_Backend As SS_Image_Backend;
+use SilverStripe\Assets\Storage\AssetContainer;
 
 /**
- * Backend for Thumbor-based image handling
+ * Backend for Thumbor-based image handling.
+ * In this case, we don't have a backend - that's all handled by the Thumbor server(s)
  * @package thumbylla
  */
 class ImageBackend implements SS_Image_Backend {
@@ -15,9 +17,46 @@ class ImageBackend implements SS_Image_Backend {
 	 * @param string $filename = null
 	 * @return void
 	 */
-	public function __construct($filename = null)  {
+	public function __construct(AssetContainer $assetContainer = null)  {
 		parent::__construct();
 	}
+
+	/**
+	 * @return int The width of the image
+	 */
+	public function getWidth() {}
+
+	/**
+	 * @return int The height of the image
+	 */
+	public function getHeight() {}
+
+	/**
+	 * Populate the backend with a given object
+	 *
+	 * @param AssetContainer $assetContainer Object to load from
+	 */
+	public function loadFromContainer(AssetContainer $assetContainer) {}
+
+	/**
+	 * Populate the backend from a local path
+	 *
+	 * @param string $path
+	 */
+	public function loadFrom($path) {}
+
+	/**
+	 * Write to the given asset store
+	 *
+	 * @param AssetStore $assetStore
+	 * @param string $filename Name for the resulting file
+	 * @param string $hash Hash of original file, if storing a variant.
+	 * @param string $variant Name of variant, if storing a variant.
+	 * @param array $config Write options. {@see AssetStore}
+	 * @return array Tuple associative array (Filename, Hash, Variant) Unless storing a variant, the hash
+	 * will be calculated from the given data.
+	 */
+	public function writeToStore(AssetStore $assetStore, $filename, $hash = null, $variant = null, $config = array()) {}
 
 	/**
 	 * writeTo - not implemented
@@ -101,7 +140,7 @@ class ImageBackend implements SS_Image_Backend {
 	 * @param int $height
 	 * @return Image_Backend
 	 */
-	public function paddedResize($width, $height, $backgroundColor = "FFFFFF")  {}
+	public function paddedResize($width, $height, $backgroundColor = "FFFFFF", $transparencyPercent = 0)  {}
 
 	/**
 	 * croppedResize
