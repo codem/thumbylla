@@ -153,6 +153,16 @@ class ImageBackend implements SS_Image_Backend {
 	public function croppedResize($width, $height) {}
 
 	/**
+   * Crop's part of image.
+   * @param int $top y position of left upper corner of crop rectangle
+   * @param int $left x position of left upper corner of crop rectangle
+   * @param int $width rectangle width
+   * @param int $height rectangle height
+   * @return Image_Backend
+   */
+  public function crop($top, $left, $width, $height) {}
+
+	/**
 	 * imageAvailable
 	 *
 	 * @param string $filename
