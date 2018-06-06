@@ -1,5 +1,5 @@
 {
-	"name": "codem/silverstripe-thumbor",
+	"name": "codem/thumbylla",
 	"description": "Thumbylla - a Thumbor integration for Silverstripe image assets",
 	"type": "silverstripe-module",
 	"keywords": [
@@ -10,10 +10,10 @@
 	"homepage": "",
 	"license": "",
 	"authors": [{
-		"name": "James Ellis",
+		"name": "James Ellis"
 	}],
 	"extra": {
-		"installer-name": "thumbor"
+		"installer-name": "thumbylla"
 	},
 	"require": {
 		"silverstripe/framework" : "~3.6",
