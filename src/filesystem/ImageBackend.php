@@ -2,6 +2,7 @@
 namespace Codem\Thumbor;
 use SilverStripe\Assets\Image_Backend As SS_Image_Backend;
 use SilverStripe\Assets\Storage\AssetContainer;
+use SilverStripe\Assets\Storage\AssetStore;
 
 /**
  * Backend for Thumbor-based image handling.
