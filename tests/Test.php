@@ -5,7 +5,7 @@ use Thumbor\Url\Builder As ThumborUrlBuilder;
 use Codem\Thumbor\ManualCropField As ManualCropField;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Core\Config;
-use SilverStripe\Assets\Image;
+use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\CompositeField;
 
@@ -39,7 +39,7 @@ class ThumborTest extends SapphireTest {
 			}
 
 			// create an image record
-			$image = Image::create();
+			$image = SS_Image::create();
 			$image->Name = 'thumbor_sample_image';
 			$image->Title = 'thumbor sample image';
 			$image->Filename = ASSETS_DIR . '/thumbor_test-' . self::SAMPLE_IMAGE;
@@ -60,7 +60,7 @@ class ThumborTest extends SapphireTest {
 	}
 
 	private function unlinkSampleImage() {
-		if($this->image instanceof Image) {
+		if($this->image instanceof SS_Image) {
 			$this->image->delete();
 		}
 	}

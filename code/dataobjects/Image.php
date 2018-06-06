@@ -2,11 +2,13 @@
 namespace Codem\Thumbor;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
+use SilverStripe\Core\Config;
+use SilverStripe\Assets\Image As SS_Image;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
  */
-class Image extends \Image {
+class Image extends SS_Image {
 
 	private static $backend = "Codem\Thumbor\ImageBackend";
 
@@ -32,11 +34,11 @@ class Image extends \Image {
 	 */
 	private function pickServer() {
 		$proto = "http://";
-		$backends = \Config::inst()->get('Codem\Thumbor\Config', 'backends');
+		$backends = Config::inst()->get('Codem\Thumbor\Config', 'backends');
 		if(!$backends || empty($backends) || !is_array($backends)) {
 			throw new \Exception("No servers defined");
 		}
-		$use_https = \Config::inst()->get('Codem\Thumbor\Config', 'use_https');
+		$use_https = Config::inst()->get('Codem\Thumbor\Config', 'use_https');
 		if($use_https) {
 			$proto = "https://";
 		}
@@ -49,7 +51,7 @@ class Image extends \Image {
 	 * @returns string
 	 */
 	public function getSecretKey() {
-		return \Config::inst()->get('Codem\Thumbor\Config', 'thumbor_generation_key');
+		return Config::inst()->get('Codem\Thumbor\Config', 'thumbor_generation_key');
 	}
 
 	/**

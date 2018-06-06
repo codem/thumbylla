@@ -1,29 +1,31 @@
 <?php
 namespace Codem\Thumbor;
+use SilverStripe\Forms\Fieldlist;
 use SilverStripe\Forms\CompositeField;
 use SilverStripe\Forms\LiteralField;
 use SilverStripe\Forms\HiddenField;
-use SilverStripe\Assets\Image;
+use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\View\Requirements;
 
 
 /**
  * Provides a manual cropping field to assist in saving ManualCrop data for the crop Thumbor command
+ * @uses cropperjs JS library
  */
-class ManualCropField extends \Object {
+class ManualCropField {
 
 	private $image;
 
 	/**
 	 * @param Image $image the original image to crop
 	 */
-	public function __construct(Image $image = null) {
+	public function __construct(SS_Image $image = null) {
 
 		$this->image = $image;
 
 	}
 
-	public function setImage(Image $image) {
+	public function setImage(SS_Image $image) {
 		$this->image = $image;
 	}
 
@@ -36,7 +38,7 @@ class ManualCropField extends \Object {
 		$path = realpath(dirname(__FILE__) . '/../../');
 		$base = basename($path);
 
-		if(!empty($this->image->ID) && $this->image instanceof Image) {
+		if(!empty($this->image->ID) && $this->image instanceof SS_Image) {
 
 			$crop_data = $this->image->ManualCropData;//need to call onCropStart on this ?
 			// Load necessary scripts and styles

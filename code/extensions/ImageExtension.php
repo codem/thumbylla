@@ -1,20 +1,24 @@
 <?php
 namespace Codem\Thumbor;
+use SilverStripe\ORM\DataExtension;
+use SilverStripe\Assets\Image As SS_Image;
+use SilverStripe\Forms\Fieldlist;
+
 /**
  * This {@link \DataExtension} provides storage for manual cropping via {@link Codem\Thumbor\ManualCropField}
  */
-class ImageExtension extends \DataExtension {
-	
+class ImageExtension extends DataExtension {
+
 	private static $db = [
 		'ManualCropData' => 'Varchar(255)',// JSON data for croppr.js, keys are x,y, width and height
 	];
-	
+
 	/**
 	 * CMS Fields
 	 * @return FieldList
 	 */
-	public function updateCmsFields(\Fieldlist $fields) {
-		if(!$this->owner instanceof \Image) {
+	public function updateCmsFields(Fieldlist $fields) {
+		if(!$this->owner instanceof SS_Image) {
 			return;
 		}
 		$cropfield = new ManualCropField( $this->owner );
@@ -24,14 +28,14 @@ class ImageExtension extends \DataExtension {
 			$fields->add($f);
 		}
 	}
-	
+
 	/**
 	 * getCropData
 	 * @returns array
 	 */
 	public function getCropData() {
 		$data = [];
-		if(!$this->owner instanceof \Image) {
+		if(!$this->owner instanceof SS_Image) {
 			return $data;
 		}
 		if($this->owner->ManualCropData) {
@@ -57,7 +61,7 @@ class ImageExtension extends \DataExtension {
 		}
 		return $data;
 	}
-	
+
 	/**
 	 * Return crop data for use in cropperjs
 	 */
@@ -69,5 +73,5 @@ class ImageExtension extends \DataExtension {
 			return "";
 		}
 	}
-	
+
 }

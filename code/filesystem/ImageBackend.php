@@ -1,11 +1,12 @@
 <?php
 namespace Codem\Thumbor;
+use SilverStripe\Assets\Image_Backend As SS_Image_Backend;
+
 /**
  * Backend for Thumbor-based image handling
- * @package silverthumb
- * @subpackage filesystem
+ * @package thumbylla
  */
-class ImageBackend extends \Object implements \Image_Backend {
+class ImageBackend implements SS_Image_Backend {
 
 
 	/**

@@ -1,11 +1,12 @@
 <?php
 namespace Codem\Thumbor;
+use SilverStripe\View\ViewableData;
 /**
  * Represents our 'image' that is returned to templates, in reality it's just going to be used to return the Thumbor Server URL
  * Some methods are provided here to provide a semblance of compatibility with \Image_Cached but you really want to call those on the original \Image
  * @todo possibly return picture tag, srcset stuff maybe
  */
-class ThumboredImage extends \ViewableData {
+class ThumboredImage extends ViewableData {
 
 	private $url, $title, $filename;
 
@@ -24,7 +25,7 @@ class ThumboredImage extends \ViewableData {
 	public function forTemplate() {
 		return $this->getTag();
 	}
-	
+
 	/**
 	 * Get the string value of a field on this object that has been suitable escaped to be inserted directly into a
 	 * template.
@@ -36,7 +37,7 @@ class ThumboredImage extends \ViewableData {
 			return "";
 		}
 	}
-	
+
 	/**
 	 * Return the alt attr for the <img>
 	 */
@@ -55,8 +56,8 @@ class ThumboredImage extends \ViewableData {
 		$alt = $this->getAltAttribute();
 		return "<img src=\"" . $url->__toString() . "\" alt=\"" . $alt . "\" />";
 	}
-	
-	
+
+
 	/**
 	 * At this point, the image exists
 	 *
@@ -96,7 +97,7 @@ class ThumboredImage extends \ViewableData {
 	public function getExtension() {
 		return \File::get_file_extension($this->getFilename());
 	}
-	
+
 	/**
 	 * Gets the image URL
 	 *
@@ -106,7 +107,7 @@ class ThumboredImage extends \ViewableData {
 		$url = $this->url->build();
 		return $url->__toString();
 	}
-	
+
 	/**
 	 * Gets the absolute URL (which is the just the URL)
 	 *
@@ -115,18 +116,18 @@ class ThumboredImage extends \ViewableData {
 	public function getAbsoluteURL() {
 		return $this->getURL();
 	}
-	
+
 	/**
-	 * Does not exist in this context as this resulting transformed image exists at the Thumbor Server 
+	 * Does not exist in this context as this resulting transformed image exists at the Thumbor Server
 	 */
 	public function getFullPath() {
 		return "";
 	}
-	
+
 	public function getRelativePath() {
 		return "";
 	}
-	
+
 	/**
 	 * Just an alias function to keep a consistent API with SiteTree
 	 *
@@ -155,4 +156,3 @@ class ThumboredImage extends \ViewableData {
 	}
 
 }
-
