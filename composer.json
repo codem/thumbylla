@@ -1,7 +1,7 @@
 {
 	"name": "codem/thumbylla",
 	"description": "Thumbylla - a Thumbor integration for Silverstripe image assets",
-	"type": "silverstripe-module",
+	"type": "silverstripe-vendormodule",
 	"keywords": [
 		"silverstripe",
 		"thumbor",
