@@ -1,9 +1,6 @@
 ---
 Name: thumbor_extensions
-After:
-  - 'framework/*'
-  - 'cms/*'
 ---
-File:
+SilverStripe\Assets\File:
   extensions:
     - 'Codem\Thumbor\ImageExtension'
