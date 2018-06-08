@@ -27,6 +27,19 @@ class Image extends SS_Image {
 		parent::__construct($record, $isSingleton, $queryParams);
 	}
 
+	/**
+	 * Override {@link ViewableData::obj()} to avoid getting previous filter requests from the Viewable data objCache
+	 * @param string $fieldName
+	 * @param array $arguments
+	 * @param bool $cache Cache this object
+	 * @param string $cacheName a custom cache name
+	 * @return Object|DBField
+	 */
+	public function obj($fieldName, $arguments = [], $cache = false, $cacheName = null) {
+		$cache = false;
+		return parent::obj($fieldName, $arguments, false, $cacheName);
+	}
+
 	public function Resampled() {
 		return $this;
 	}
