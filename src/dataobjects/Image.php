@@ -2,7 +2,7 @@
 namespace Codem\Thumbor;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
-use SilverStripe\Core\Config;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Image As SS_Image;
 
 /**
@@ -10,7 +10,7 @@ use SilverStripe\Assets\Image As SS_Image;
  */
 class Image extends SS_Image {
 
-	private static $backend = "Codem\Thumbor\ImageBackend";
+	private static $table_name = "ThumborImage";
 
 	/**
 	 * @var Thumbor\Url\Builder
@@ -20,12 +20,15 @@ class Image extends SS_Image {
 	private $halign = "center";
 	private $valign = "middle";
 
-	public function __construct($record = null, $isSingleton = false, $model = null) {
-		if(is_string($record)) {
-			// handle UploadField passing a string as record when class_for_file_extension is not overridden
-			$record = null;
-		}
-		parent::__construct($record, $isSingleton, $model);
+	private $_cache_width = 0;//the width of the original image uploaded
+	private $_cache_height = 0;//the height of the original image uploaded
+
+	public function __construct($record = null, $isSingleton = false, $queryParams = array()) {
+		parent::__construct($record, $isSingleton, $queryParams);
+	}
+
+	public function Resampled() {
+		return $this;
 	}
 
 	/**
@@ -43,7 +46,8 @@ class Image extends SS_Image {
 			$proto = "https://";
 		}
 		$key = array_rand($backends, 1);
-		return $proto . $backends[$key];
+		$server = $proto . $backends[$key];
+		return $server;
 	}
 
 	/**
@@ -102,6 +106,43 @@ class Image extends SS_Image {
 	 */
 	public function isHeight($height) {
 		return false;
+	}
+
+	public function getOriginalWidth() {
+		if(!$this->_cache_width) {
+			$this->_cache_width = $this->getWidth();
+		}
+		return $this->_cache_width;
+	}
+
+	public function getOriginalHeight() {
+		if(!$this->_cache_height) {
+			$this->_cache_height = $this->getHeight();
+		}
+		return $this->_cache_height;
+	}
+
+	/**
+	 * As filters are chainable, getting multiple manipulations in a template on the same image
+	 * can result in filters being retained for the 2nd image.
+	 *
+	 * Example with Restart() in a template
+	 * $TestImage.Pad(500,300, 'fc0') - /fit-in/500x300/filters:fill(fc0)/_URL_
+	 * $TestImage.Align('left','top').Fill(160,160) - /160x160/left/top/_URL_
+	 *
+	 * Example without Restart() in a template
+	 * $TestImage.Pad(500,300, 'fc0') - /fit-in/500x300/filters:fill(fc0)/_URL_
+	 * $TestImage.Align('left','top').Fill(160,160) - /160x160/left/top/filters:fill(fc0)/_URL_
+	 *
+	 * Without Restart() the fc0 filter is incorrectly carried to the 2nd image request in the template
+	 *
+	 * If we are displaying the same image in multiple ways.
+	 * Call $Image.Restart().Filter() to the thumbor_url instance and start from scratch;
+	 */
+	public function Restart() {
+		// Reset thumbor_url
+		$this->thumbor_url = $this->generateUrlInstance();
+		return $this;
 	}
 
 	/**
@@ -174,18 +215,8 @@ class Image extends SS_Image {
 	 */
 	public function ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom) {
 
-		$path = $this->getFullPath();
-		if(!is_readable($path)) {
-			return null;
-		}
-
-		$meta_original = getimagesize( $path );
-		if(empty($meta_original[0]) || empty($meta_original[1])) {
-			return null;
-		}
-
-		$width = $meta_original[0];
-		$height = $meta_original[1];
+		$width = $this->getOriginalWidth();
+		$height = $this->getOriginalHeight();
 		// calculate the bottom/right/x|y values
 		$bottom_right_x = $width - $in_from_right;
 		$bottom_right_y = $height - $in_from_bottom;
@@ -251,6 +282,177 @@ class Image extends SS_Image {
 		return $this;
 	}
 
+	/**
+	 * Return URL representing an image scaled to the provided width
+	 */
+	public function ScaleWidth($width) {
+		return $this->getFormattedImage('ScaleWidth', $width);
+	}
+
+	/**
+	 * Proportionally scale down this image if it is wider than the specified width.
+	 * Similar to ScaleWidth but without up-sampling. Use in templates with $ScaleMaxWidth.
+	 *
+	 * @param int $width The maximum width of the output image
+	 * @return Codem\ThumboredImage
+	 */
+	public function ScaleMaxWidth($width) {
+			$width = $this->castDimension($width, 'Width');
+			$original_width = $this->getOriginalWidth();
+			if($original_width <= $width) {
+				$width = $original_width;
+			}
+			return $this->getFormattedImage('ScaleWidth', $width);
+	}
+
+	/**
+	 * Return URL representing an image resized/cropped to fill specified dimensions
+	 */
+	public function Fill($width, $height, $test = '') {
+	//	var_dump("Fill {$width}/{$height} called");
+		if($width == 600 && $height == 400) {
+			//print "<pre>pre {$test} {$height}\n";var_dump($this->thumbor_url);print "</pre>";
+		}
+		$fmt = $this->getFormattedImage('Fill', $width, $height);
+		if($width == 600 && $height == 400) {
+			//print "<pre>post {$test} {$height}\n";var_dump($this->thumbor_url);print "</pre>";
+		}
+		return $fmt;
+	}
+
+	/**
+	 * Crop this image to the aspect ratio defined by the specified width and height,
+	 * then scale down the image to those dimensions if it exceeds them.
+	 * Similar to Fill but without up-sampling. Use in templates with $FillMax.
+	 *
+	 * @param int $width The relative (used to determine aspect ratio) and maximum width of the output image
+	 * @param int $height The relative (used to determine aspect ratio) and maximum height of the output image
+	 * @return Codem\ThumboredImage
+	 */
+	public function FillMax($width, $height) {
+			$width = $this->castDimension($width, 'Width');
+			$height = $this->castDimension($height, 'Height');
+
+			$original_width = $this->getOriginalWidth();
+			$original_height = $this->getOriginalHeight();
+
+			if (!$original_width || !$original_height) {
+				return null;
+			}
+
+			if ($original_width === $width && $original_height === $height) {
+				// return a representation of the original image
+				return $this->Original();
+			}
+
+			// Compare current and destination aspect ratios
+			$image_ratio = $original_width / $original_height;
+			$crop_ratio = $width / $height;
+			if ($crop_ratio < $image_ratio && $currentHeight < $height) {
+				// Crop off sides
+				$width_new = round($original_height * $crop_ratio);
+				$height_new = $original_height;
+			} elseif ($currentWidth < $width) {
+				// Crop off top/bottom
+				$width_new = $original_width;
+				$height_new = round($original_width / $crop_ratio);
+			} else {
+				// Crop on both
+				$width_new = $width;
+				$height_new = $height;
+			}
+
+			return  $this->getFormattedImage('Fill', $width_new, $height_new);
+	}
+
+	/**
+	 * Crop image on Y axis if it exceeds specified height. Retain width.
+	 * Use in templates with $CropHeight. Example: $Image.ScaleWidth(100).CropHeight(100)
+	 *
+	 * @uses CropManipulation::Fill()
+	 * @param int $height The maximum height of the output image
+	 * @return Codem\ThumboredImage
+	 */
+	public function CropHeight($height) {
+		$original_width = $this->getOriginalWidth();
+		$original_height = $this->getOriginalHeight();
+		if($original_height <= $height) {
+			return $this->Original();
+		}
+		return $this->getFormattedImage('Fill', $original_width, $height);
+	}
+
+	/**
+	 * Crop image on X axis if it exceeds specified width. Retain height.
+	 * Use in templates with $CropWidth. Example: $Image.ScaleHeight(100).$CropWidth(100)
+	 *
+	 * @uses CropManipulation::Fill()
+	 * @param int $width The maximum width of the output image
+	 * @return Codem\ThumboredImage
+	 */
+	public function CropWidth($width) {
+			$original_width = $this->getOriginalWidth();
+			$original_height = $this->getOriginalHeight();
+			if($original_width <= $width) {
+				return $this->Original();
+			}
+			return $this->getFormattedImage('Fill', $width, $original_height);
+	}
+
+	/**
+	 * Scale image proportionally by height. Use in templates with $ScaleHeight.
+	 *
+	 * @param int $height The height to set
+	 * @return Codem\ThumboredImage
+	 */
+	public function ScaleHeight($height) {
+		$original_height = $this->getOriginalHeight();
+		return $this->getFormattedImage('ScaleHeight', $height);
+	}
+
+	/**
+	 * Proportionally scale down this image if it is taller than the specified height.
+	 * Similar to ScaleHeight but without up-sampling. Use in templates with $ScaleMaxHeight.
+	 *
+	 * @uses ScalingManipulation::ScaleHeight()
+	 * @param int $height The maximum height of the output image
+	 * @return AssetContainer
+	 */
+	public function ScaleMaxHeight($height) {
+			$height = $this->castDimension($height, 'Height');
+			$original_height = $this->getOriginalHeight();
+			var_dump($original_height);
+			if($original_height <= $height) {
+				return $this->Original();
+			}
+			return $this->getFormattedImage('ScaleHeight', $height);
+	}
+
+	/**
+	 * Note that Thumbor avoids skewing images, so this may not return what you expect
+	 *
+	 * @param int $width Width to resize to
+	 * @param int $height Height to resize to
+	 * @return Codem\ThumboredImage
+	 */
+	public function ResizedImage($width, $height) {
+		return $this->getFormattedImage(__FUNCTION__, $width, $height);
+	}
+
+	/**
+	 * Fit image to specified dimensions and fill leftover space with a solid colour (default white). Use in
+	 * templates with $Pad.
+	 *
+	 * @param int $width The width to size to
+	 * @param int $height The height to size to
+	 * @param string $backgroundColor
+	 * @param int $transparencyPercent Level of transparency - not supported by Thumbor
+	 * @return Codem\ThumboredImage
+	 */
+	public function Pad($width, $height, $backgroundColor = 'FFFFFF', $transparencyPercent = 0) {
+		return $this->getFormattedImage('Pad', $width, $height, $backgroundColor, $transparencyPercent);
+	}
+
 	/*
 	 * Return a Codem\ThumboredImage object representing the image to be resample/sized by the Thumbor server.
 
@@ -280,6 +482,7 @@ class Image extends SS_Image {
 	 */
 	public function getFormattedImage($format) {
 		$args = func_get_args();
+		//print "<pre>";print_r($args);print "</pre>";
 		array_shift($args);
 		$this->UrlInstance();// create a url instance if not already created
 		switch($format) {
@@ -299,21 +502,6 @@ class Image extends SS_Image {
 				if($this->halign && $this->valign) {
 					$this->thumbor_url = $this->thumbor_url->valign($this->valign)->halign($this->halign);
 				}
-				break;
-			case 'CMSThumbnail':// default CMS Thumbnail
-				$this->thumbor_url->resize($this->stat('cms_thumbnail_width'),$this->stat('cms_thumbnail_height'));// e.g 100x100
-				break;
-			case 'AssetLibraryPreview':
-			case 'assetlibrarypreview':
-				$this->thumbor_url->resize($this->stat('asset_preview_width'),$this->stat('asset_preview_height'));// e.g 400x200
-				break;
-			case 'AssetLibraryThumbnail':
-			case 'assetlibrarythumbnail':
-				$this->thumbor_url->resize($this->stat('asset_thumbnail_width'),$this->stat('asset_thumbnail_height'));// e.g 100x100
-				break;
-			case 'StripThumbnail':
-			case 'stripthumbnail':
-				$this->thumbor_url->resize($this->stat('strip_thumbnail_width'),$this->stat('strip_thumbnail_height'));// e.g 50x50
 				break;
 			case 'FlipVertical':
 				// flip the original image
@@ -357,7 +545,7 @@ class Image extends SS_Image {
 				$this->thumbor_url->fitIn($args[0], $args[1]);// e.g 300x300
 				break;
 			case 'ResizedImage':
-				// this can result in images that are oddly cropped
+				// this *could* result in images that are oddly cropped
 				$this->thumbor_url->resize($args[0], $args[1]);
 				break;
 			case 'Original':
