@@ -1,14 +1,18 @@
 ---
 Name: thumbor_config
+After:
+  - '#assetsimage'
+  - '#assetscore'
+  - '#assetadmingraphql-dependencies'
+  - '#assetadminthumbnails'
+  - '#assetsfieldtypes'
+  - '#assetadmin'
+  - '#assetadminfield'
 ---
-# use our image class
-#Injector:
-#  Image:
-#    class: 'Codem\Thumbor\Image'
 # Example config for creating images
-#Codem\Thumbor\Config:
+Codem\Thumbor\Config:
   # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
-  # thumbor_generation_key: 'MY_SECURE_KEY'
+  thumbor_generation_key: ''
   # use_https : true
   # if serving off a directory
   # backend_path : ''
@@ -17,13 +21,21 @@ Name: thumbor_config
   #  - 'cdn1.example.com'
 #Codem\Thumbor\Image:
 #Codem\Thumbor\Image_Backend:
-#---
-#Name: thumbor_mapping_config
-#---
-#File:
-#  class_for_file_extension:
-#    'jpg': 'Codem\Thumbor\Image'
-#    'jpeg': 'Codem\Thumbor\Image'
-#    'gif': 'Codem\Thumbor\Image'
-#    'png': 'Codem\Thumbor\Image'
-#    'webp': 'Codem\Thumbor\Image'
+---
+Name: thumbor_mapping_config
+After:
+  - '#assetsimage'
+  - '#assetscore'
+  - '#assetadmingraphql-dependencies'
+  - '#assetadminthumbnails'
+  - '#assetsfieldtypes'
+  - '#assetadmin'
+  - '#assetadminfield'
+---
+SilverStripe\Assets\File:
+  class_for_file_extension:
+    'jpg': 'Codem\Thumbor\Image'
+    'jpeg': 'Codem\Thumbor\Image'
+    'gif': 'Codem\Thumbor\Image'
+    'png': 'Codem\Thumbor\Image'
+    'webp': 'Codem\Thumbor\Image'

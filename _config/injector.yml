@@ -1,0 +1,21 @@
+---
+Name: thumbor_injection
+After:
+  - '#assetsimage'
+  - '#assetscore'
+  - '#assetadmingraphql-dependencies'
+  - '#assetadminthumbnails'
+  - '#assetsfieldtypes'
+  - '#assetadmin'
+  - '#assetadminfield'
+---
+# Use the Thumbor backend
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Assets\Image:
+    class: 'Codem\Thumbor\Image'
+  SilverStripe\Assets\Image_Backend:
+    class: Codem\Thumbor\ImageBackend
+  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.graphql:
+    class: Codem\Thumbor\ThumbnailGenerator
+  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
+    class: Codem\Thumbor\ThumbnailGenerator

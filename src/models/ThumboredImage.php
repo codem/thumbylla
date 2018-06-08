@@ -32,10 +32,14 @@ class ThumboredImage extends ViewableData {
 	 */
 	public function XML_val($field, $arguments = null, $cache = false) {
 		if($this->url) {
-			return $this->url->build()->__toString();
+			return $this->__toString();
 		} else {
 			return "";
 		}
+	}
+
+	public function __toString() {
+		return $this->url->build()->__toString();
 	}
 
 	/**
