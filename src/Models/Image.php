@@ -7,6 +7,7 @@ use SilverStripe\Assets\Image As SS_Image;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
+ * @todo maybe the overriding methods e.g ScaleWidth to the {@link Codem\Thumbor\ImageBackend} and access them via {@link SilverStripe\Assets\ImageManipulation}
  */
 class Image extends SS_Image {
 

@@ -5,10 +5,11 @@ use Thumbor\Url\Builder As ThumborUrlBuilder;
 use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Assets\Image_Backend As SS_Image_Backend;
 use SilverStripe\Assets\Storage\AssetContainer;
-use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\InterventionBackend;
 use SilverStripe\Core\Flushable;
+use SilverStripe\Assets\Storage\AssetStore;
+use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
 
 /**
  * An Image Backend for Thumbor-based image handling, replacing the InterventionBackend
@@ -33,6 +34,13 @@ class ImageBackend extends InterventionBackend implements SS_Image_Backend, Flus
 
 	public function setImage(SS_Image $image) {
 		$this->image = $image;
+	}
+
+	/**
+	 * @returns boolean
+	 */
+	protected function getIsProtected() {
+		return $this->image && $this->image->getVisibility() == AssetStore::VISIBILITY_PROTECTED;
 	}
 
 	/**
@@ -64,13 +72,92 @@ class ImageBackend extends InterventionBackend implements SS_Image_Backend, Flus
 	}
 
 	/**
+	 * This is NOT the key used to validate/sign images, it's used to generate a token for protected image access
+	 * @returns string
+	 */
+	protected static function getProtectedSigningKey() {
+		return Config::inst()->get('Codem\Thumbor\Config', 'signing_key');
+	}
+
+	/**
+	 * This is NOT the key used to validate/sign images, it's used to generate a token for protected image access
+	 * @returns string
+	 */
+	protected static function getPublicSigningKey() {
+		return Config::inst()->get('Codem\Thumbor\Config', 'public_signing_key');
+	}
+
+	/**
 	 * @returns Thumbor\Url\Builder
 	 */
 	private function generateUrlInstance() {
+		if(!$this->image) {
+			return null;
+		}
+
+		$image_url = $this->image->getAbsoluteURL();
+
 		$server = $this->pickServer();
 		$secret = $this->getSecretKey();
-		$inst = ThumborUrlBuilder::construct($server, $secret, $this->image->getAbsoluteURL());
+		// sign the URL if the image is protected
+		if($protected = $this->getIsProtected()) {
+			$image_url = self::signWithToken($image_url);
+		}
+		$inst = ThumborUrlBuilder::construct($server, $secret, $image_url);
 		return $inst;
+	}
+
+	/**
+	 * Add a token and timestamp to the URL, using the Thumbor generation key
+	 * @param integer $expires seconds
+	 * @param string $image_url
+	 */
+	public static function signWithToken($image_url, $expires = 10) {
+		$parts = parse_url($image_url);
+		$path  = $parts['path'];
+		$timestamp = microtime(true) + $expires;
+		$token = self::signPath($path, $timestamp);
+		if(!$token) {
+			/**
+			 * If no token, return the non-token'd URL
+			 * loading the image via Thumbor will most likely fail as the image is "protected"
+			 * which is as expected
+			 */
+			return $image_url;
+		}
+		$query = "";
+		if(!empty($parts['query'])) {
+			$query = $parts['query'] . "&";
+		}
+		// a is the token, b is the expiry timestamp
+		$query .= "a=" . $token . "&b=" . $timestamp;
+		$image_url = $parts['scheme'] . "://"
+									. $parts['host']
+									. (!empty($parts['port']) ? ":" . $parts['port'] : "")
+									. $parts['path']
+									. rawurlencode("?" . $query);
+		/**
+		 * the image URL thumbor loads now looks like this:
+		 * http://protected.image.url?a=<token>&b=<expiry>
+		 * See {@link Codem\Thumbor\AssetStore} for token/expiry checking
+		 */
+		return $image_url;
+	}
+
+	/**
+	 * Sign the path provided and the expiry timestamp provided with the signing key
+	 * See {@link Codem\Thumbor\AssetStore::isGranted()}
+	 * @returns string
+	 */
+	public static function signPath($path, $timestamp) {
+		$key = self::getProtectedSigningKey();
+		if(!$key) {
+			return "";
+		}
+		if(strlen($key) <  64) {
+			return "";
+		}
+		return hash_hmac ( "sha256" , $path . $timestamp , $key, false );
 	}
 
 	/**

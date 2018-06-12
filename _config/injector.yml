@@ -8,6 +8,7 @@ After:
   - '#assetsfieldtypes'
   - '#assetadmin'
   - '#assetadminfield'
+  - '#assetsflysystem'
 ---
 # Use the Thumbor backend
 SilverStripe\Core\Injector\Injector:
@@ -19,3 +20,5 @@ SilverStripe\Core\Injector\Injector:
     class: Codem\Thumbor\ThumbnailGenerator
   SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
     class: Codem\Thumbor\ThumbnailGenerator
+  SilverStripe\Assets\Storage\AssetStore:
+    class: Codem\Thumbor\AssetStore
