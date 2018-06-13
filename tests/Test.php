@@ -1,11 +1,14 @@
 <?php
+namespace Codem\Thumbor;
 use Codem\Thumbor\ThumboredImage;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
 use Codem\Thumbor\ManualCropField As ManualCropField;
 use SilverStripe\Dev\SapphireTest;
-use SilverStripe\Core\Config;
+use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Image As SS_Image;
+use SilverStripe\Assets\File;
+use SilverStripe\Assets\Folder;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\CompositeField;
 
@@ -19,48 +22,33 @@ class ThumborTest extends SapphireTest {
 	const HEIGHT = 320;
 	const SAMPLE_IMAGE = 'unsplash_5bxCaAcu1dc.jpg';// 2248 × 1515
 
+	protected $usesDatabase = true;
+	protected static $fixture_file = 'ThumborImageTest.yml';
+
 	private $image;
 
 	public function setUp() {
 		parent::setUp();
-		Config::inst()->update('Director', 'alternate_base_url', '/');
-		$this->createSampleImage();
+
+		// Copy test images for each of the fixture references
+		/** @var File $image */
+		$files = File::get()->exclude('ClassName', Folder::class);
+		foreach ($files as $image) {
+			$sourcePath = __DIR__ . '/samples/' . $image->Name;
+			$image->setFromLocalFile($sourcePath, $image->Filename);
+			$image->publishFile();
+		}
+		$this->image = $this->objFromFixture(Image::class, 'sampleImage');
+
 	}
 
-	private function createSampleImage() {
-
-			// get the sample image from ./samples
-			$sample_image_path = dirname(__FILE__) . '/samples/' . self::SAMPLE_IMAGE;
-			$destination_path = ASSETS_PATH . '/thumbor_test-' . self::SAMPLE_IMAGE;
-			if(!file_exists($destination_path)) {
-				if (!copy($sample_image_path, $destination_path)) {
-					throw new \Exception('Could not copy sample image');
-				}
-			}
-
-			// create an image record
-			$image = SS_Image::create();
-			$image->Name = 'thumbor_sample_image';
-			$image->Title = 'thumbor sample image';
-			$image->Filename = ASSETS_DIR . '/thumbor_test-' . self::SAMPLE_IMAGE;
-			$image->ParentID = 0;
-
-			$image->write();
-
-			if(empty($image->ID)) {
-				$this->unlinkSampleImageByPath($destination_path);
-				throw new \Exception("Could not create image record");
-			}
-
-			$this->image = $image;
-	}
-
-	private function unlinkSampleImageByPath($path) {
-		return unlink($path);
+	public function tearDown() {
+		parent::tearDown();
+		$this->unlinkSampleImage();
 	}
 
 	private function unlinkSampleImage() {
-		if($this->image instanceof SS_Image) {
+		if($this->image) {
 			$this->image->delete();
 		}
 	}
@@ -69,16 +57,8 @@ class ThumborTest extends SapphireTest {
 		return $this->image;
 	}
 
-	public function tearDown() {
-		parent::tearDown();
-		$this->unlinkSampleImage();
-		Config::inst()->update('Director', 'alternate_base_url', '');
-	}
-
 	public function testHasGenerationKey() {
-		$image = $this->getSampleImage();
-		$this->assertTrue( !empty($image->ID) && $image->exists() );
-		$key = $image->getSecretKey();
+		$key = Config::inst()->get('Codem\Thumbor\Config', 'thumbor_generation_key');
 		$this->assertNotNull( $key );
 	}
 
@@ -88,6 +68,7 @@ class ThumborTest extends SapphireTest {
 	public function testUrlGeneration() {
 
 		$image = $this->getSampleImage();
+
 		$this->assertTrue( !empty($image->ID) && $image->exists() );
 
 		// Generate a thumb

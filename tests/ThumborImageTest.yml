@@ -1,0 +1,10 @@
+SilverStripe\Assets\Folder:
+  folder1:
+    Name: folder
+Codem\Thumbor\Image:
+  sampleImage:
+    Title: 'Sample Image'
+    FileFilename: folder/unsplash_5bxCaAcu1dc.jpg
+    FileHash: 4ba409f5e91b5c2a7cfe1160784669944ce16985
+    Parent: =>SilverStripe\Assets\Folder.folder1
+    Name: unsplash_5bxCaAcu1dc.jpg
