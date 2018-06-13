@@ -22,7 +22,7 @@ class ThumbnailGenerator extends BaseThumbnailGenerator {
       if (!$file || !$file->getIsImage() || !$file->exists()) {
         return null;
       }
-      $backend = new ImageBackend();
+      $backend = new ThumbyllaImageBackend();
       $backend->setImage($file);
       $args = ['FitMax', $width, $height];
       $thumbored_image = $backend->getFormattedImage($args);

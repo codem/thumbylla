@@ -16,7 +16,7 @@ use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
  * Remember, the actual 'backend' is the Thumbor Server, all we do is create image URLs ;)
  * @package thumbylla
  */
-class ImageBackend extends InterventionBackend implements SS_Image_Backend, Flushable {
+class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Backend, Flushable {
 
 
 	/**

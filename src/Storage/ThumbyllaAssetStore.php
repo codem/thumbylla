@@ -1,5 +1,4 @@
 <?php
-
 namespace Codem\Thumbor;
 
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
@@ -11,10 +10,10 @@ use SilverStripe\Core\Injector\Injector;
 /**
  * Asset store based on flysystem Filesystem as a backend
  */
-class AssetStore extends FlysystemAssetStore {
+class ThumbyllaAssetStore extends FlysystemAssetStore {
   /**
    * Check if a signed URL is present - determine if a grant exists for the given FileID
-   * Signed URLs are created in the {@link Codem\Thumbor\ImageBackend}:
+   * Signed URLs are created in the {@link Codem\Thumbor\ThumbyllaImageBackend}:
    * - The backend sets an expiry timestamp for the image
    * - The backend adds a signed token, the value being the
    *
@@ -55,7 +54,7 @@ class AssetStore extends FlysystemAssetStore {
         if(empty($parts['path'])) {
           throw new \Exception("Not path provided in uri:{$uri}");
         }
-        $token = ImageBackend::signPath($parts['path'], $query['b']);
+        $token = ThumbyllaImageBackend::signPath($parts['path'], $query['b']);
         if($token != $query['a']) {
           throw new \Exception("Token mismatch");
         }
@@ -69,4 +68,5 @@ class AssetStore extends FlysystemAssetStore {
     // let the main AssetStore handle success/error
     return parent::isGranted($fileID);
   }
+
 }

@@ -7,7 +7,7 @@ use SilverStripe\Assets\Image As SS_Image;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
- * @todo maybe the overriding methods e.g ScaleWidth to the {@link Codem\Thumbor\ImageBackend} and access them via {@link SilverStripe\Assets\ImageManipulation}
+ * @todo maybe the overriding methods e.g ScaleWidth to the {@link Codem\Thumbor\ThumbyllaImageBackend} and access them via {@link SilverStripe\Assets\ImageManipulation}
  */
 class Image extends SS_Image {
 
@@ -17,7 +17,7 @@ class Image extends SS_Image {
 
 	public function __construct($record = null, $isSingleton = false, $queryParams = array()) {
 		parent::__construct($record, $isSingleton, $queryParams);
-		$this->image_backend = new ImageBackend();
+		$this->image_backend = new ThumbyllaImageBackend();
 		$this->image_backend->setImage($this);
 	}
 

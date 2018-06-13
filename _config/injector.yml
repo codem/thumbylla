@@ -15,10 +15,10 @@ SilverStripe\Core\Injector\Injector:
   SilverStripe\Assets\Image:
     class: 'Codem\Thumbor\Image'
   SilverStripe\Assets\Image_Backend:
-    class: Codem\Thumbor\ImageBackend
+    class: Codem\Thumbor\ThumbyllaImageBackend
   SilverStripe\AssetAdmin\Model\ThumbnailGenerator.graphql:
     class: Codem\Thumbor\ThumbnailGenerator
   SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
     class: Codem\Thumbor\ThumbnailGenerator
   SilverStripe\Assets\Storage\AssetStore:
-    class: Codem\Thumbor\AssetStore
+    class: Codem\Thumbor\ThumbyllaAssetStore
