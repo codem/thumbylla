@@ -4,6 +4,7 @@ use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Image As SS_Image;
+use SilverStripe\Assets\Storage\AssetStore;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
@@ -17,7 +18,11 @@ class Image extends SS_Image {
 
 	public function __construct($record = null, $isSingleton = false, $queryParams = array()) {
 		parent::__construct($record, $isSingleton, $queryParams);
-		$this->image_backend = new ThumbyllaImageBackend();
+		if($this->getVisibility() == AssetStore::VISIBILITY_PROTECTED) {
+			$this->image_backend = new ThumbyllaProtectedImageBackend();
+		} else {
+			$this->image_backend = new ThumbyllaImageBackend();
+		}
 		$this->image_backend->setImage($this);
 	}
 

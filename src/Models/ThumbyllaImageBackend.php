@@ -37,29 +37,29 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 	}
 
 	/**
-	 * @returns boolean
-	 */
-	protected function getIsProtected() {
-		return $this->image && $this->image->getVisibility() == AssetStore::VISIBILITY_PROTECTED;
-	}
-
-	/**
 	 * Based on config, pick a server to serve an image
 	 * @returns string
 	 */
-	private function pickServer() {
-		$proto = "http://";
+	protected function pickBackendHost() {
 		$backends = Config::inst()->get('Codem\Thumbor\Config', 'backends');
 		if(!$backends || empty($backends) || !is_array($backends)) {
 			throw new \Exception("No servers defined");
 		}
+		$key = array_rand($backends, 1);
+		$server = $backends[$key];
+		return $server;
+	}
+
+	/**
+	 * Get the protocol of the Thumbor image servers
+	 */
+	protected function getProtocol() {
+		$protocol = "http";
 		$use_https = Config::inst()->get('Codem\Thumbor\Config', 'use_https');
 		if($use_https) {
-			$proto = "https://";
+			$protocol = "https";
 		}
-		$key = array_rand($backends, 1);
-		$server = $proto . $backends[$key];
-		return $server;
+		return $protocol . "://";
 	}
 
 	/**
@@ -76,15 +76,7 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 	 * @returns string
 	 */
 	protected static function getProtectedSigningKey() {
-		return Config::inst()->get('Codem\Thumbor\Config', 'signing_key');
-	}
-
-	/**
-	 * This is NOT the key used to validate/sign images, it's used to generate a token for protected image access
-	 * @returns string
-	 */
-	protected static function getPublicSigningKey() {
-		return Config::inst()->get('Codem\Thumbor\Config', 'public_signing_key');
+		throw new \Exception("Public backend doesn't need to sign URLs");
 	}
 
 	/**
@@ -95,70 +87,18 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 			return null;
 		}
 
-		$image_url = $this->image->getAbsoluteURL();
-
-		$server = $this->pickServer();
+		$backend_host = $this->pickBackendHost();
+		$protocol = $this->getProtocol();
 		$secret = $this->getSecretKey();
-		// sign the URL if the image is protected
-		if($protected = $this->getIsProtected()) {
-			$image_url = self::signWithToken($image_url);
-		}
-		$inst = ThumborUrlBuilder::construct($server, $secret, $image_url);
+
+		$image_url = $this->image->getAbsoluteURL();
+		$this->signURL($backend_host, $image_url);
+
+		$inst = ThumborUrlBuilder::construct($protocol . $backend_host, $secret, $image_url);
 		return $inst;
 	}
 
-	/**
-	 * Add a token and timestamp to the URL, using the Thumbor generation key
-	 * @param integer $expires seconds
-	 * @param string $image_url
-	 */
-	public static function signWithToken($image_url, $expires = 10) {
-		$parts = parse_url($image_url);
-		$path  = $parts['path'];
-		$timestamp = microtime(true) + $expires;
-		$token = self::signPath($path, $timestamp);
-		if(!$token) {
-			/**
-			 * If no token, return the non-token'd URL
-			 * loading the image via Thumbor will most likely fail as the image is "protected"
-			 * which is as expected
-			 */
-			return $image_url;
-		}
-		$query = "";
-		if(!empty($parts['query'])) {
-			$query = $parts['query'] . "&";
-		}
-		// a is the token, b is the expiry timestamp
-		$query .= "a=" . $token . "&b=" . $timestamp;
-		$image_url = $parts['scheme'] . "://"
-									. $parts['host']
-									. (!empty($parts['port']) ? ":" . $parts['port'] : "")
-									. $parts['path']
-									. rawurlencode("?" . $query);
-		/**
-		 * the image URL thumbor loads now looks like this:
-		 * http://protected.image.url?a=<token>&b=<expiry>
-		 * See {@link Codem\Thumbor\AssetStore} for token/expiry checking
-		 */
-		return $image_url;
-	}
-
-	/**
-	 * Sign the path provided and the expiry timestamp provided with the signing key
-	 * See {@link Codem\Thumbor\AssetStore::isGranted()}
-	 * @returns string
-	 */
-	public static function signPath($path, $timestamp) {
-		$key = self::getProtectedSigningKey();
-		if(!$key) {
-			return "";
-		}
-		if(strlen($key) <  64) {
-			return "";
-		}
-		return hash_hmac ( "sha256" , $path . $timestamp , $key, false );
-	}
+	protected function signURL($backend_host, &$image_url) {}
 
 	/**
 	 * Create an instance of Thumbor\Url\Builder for this image, if it doesn't already exist

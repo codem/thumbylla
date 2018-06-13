@@ -15,12 +15,18 @@ Codem\Thumbor\Config:
   thumbor_generation_key: 'override_this_in_your_project'
   # the key used to sign protected image urls, best to not use the generation key above
   signing_key: 'a >= 64 character key used to sign protected image urls'
+  # a salt used in signing protected image urls
+  salt: ''
   use_https : true
+  expiry_time: 10
   # if serving off a directory
   backend_path : ''
   # list all backends here, as many as you want
   # backends:
   #  - 'cdn1.example.com'
+  # Protected backends are used to serve protected assets
+  # protected_backends:
+  #  - 'protected1.example.com'
 ---
 Name: thumbor_mapping_config
 After:
