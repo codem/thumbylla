@@ -152,6 +152,10 @@ Test your configuration ```sudo nginx -t``` and reload nginx.
 
 Once the module is installed and configured, you can monitor requests by looking at both the Supervisor and Nginx logs.
 
+## Performance
+
+Best read a guide on tweaking Nginx performance for static file delivery ;)
+
 
 ## Troubleshooting
 
