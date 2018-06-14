@@ -89,8 +89,6 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
 
           if(!$host_token_match) {
             throw new \Exception("Host token mismatch");
-          } else {
-            syslog(LOG_INFO, "HOST TOKEN MATCH");
           }
         }
         // token matches AND is not expired, this protected image URL can be viewed
@@ -125,7 +123,6 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
         'Expires' => $expires->format(\DateTime::RFC822)
       ];
       foreach ($headers as $header => $value) {
-        syslog(LOG_INFO, "Setting header {$header} {$value}");
         $response->addHeader($header, $value);
       }
     }

@@ -14,22 +14,6 @@ class ImageExtension extends DataExtension {
 	];
 
 	/**
-	 * CMS Fields
-	 * @return FieldList
-	 */
-	public function updateCmsFields(Fieldlist $fields) {
-		if(!$this->owner instanceof SS_Image) {
-			return;
-		}
-		$cropfield = new ManualCropField( $this->owner );
-		if($fields->hasTabSet()) {
-			$fields->addFieldToTab('Root.Main', $cropfield->getField());
-		} else {
-			$fields->add($f);
-		}
-	}
-
-	/**
 	 * getCropData
 	 * @returns array
 	 */

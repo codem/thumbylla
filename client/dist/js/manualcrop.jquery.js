@@ -6,7 +6,8 @@
 		$('div[data-manualcropdata]').entwine({
 			onmatch: function() {
 				var data = $(this).data('manualcropdata');
-				var saveto = $(this).data('saveto');
+				var saveto = $(this).parents('.CompositeField:first').find('input[name="ManualCropData"]:first');
+				console.log(saveto);
 				var img = $(this).children('img')[0];
 				var cropper = new Cropper( img, {
 					viewMode: 1,
@@ -30,7 +31,7 @@
 							width : Math.round(e.detail.width),
 							height : Math.round(e.detail.height)
 						};
-						jQuery('#' + saveto).val( JSON.stringify(save_data) );
+						saveto.val( JSON.stringify(save_data) );
 					}
 
 				});

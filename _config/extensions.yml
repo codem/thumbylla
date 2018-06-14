@@ -4,3 +4,6 @@ Name: thumbor_extensions
 SilverStripe\Assets\File:
   extensions:
     - 'Codem\Thumbor\ImageExtension'
+SilverStripe\AssetAdmin\Forms\AssetFormFactory:
+  extensions:
+    - 'Codem\Thumbor\AssetFormFactoryExtension'

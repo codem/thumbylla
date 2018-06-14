@@ -15,8 +15,9 @@
 	"extra": {
 		"installer-name": "thumbylla",
 		"expose": [
-				"public/javascript",
-				"public/lib"
+				"client/dist/js",
+				"client/dist/css",
+				"client/lib/cropperjs/dist"
 		]
 	},
 	"require": {

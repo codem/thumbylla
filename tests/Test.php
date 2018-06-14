@@ -11,6 +11,7 @@ use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\CompositeField;
+use SilverStripe\Assets\Storage\AssetStore;
 
 /**
  * Module tests
@@ -27,6 +28,8 @@ class ThumborTest extends SapphireTest {
 
 	private $image;
 
+	private $asset_store;
+
 	public function setUp() {
 		parent::setUp();
 
@@ -39,12 +42,13 @@ class ThumborTest extends SapphireTest {
 			$image->publishFile();
 		}
 		$this->image = $this->objFromFixture(Image::class, 'sampleImage');
+		$this->asset_store = singleton(AssetStore::class);
 
 	}
 
 	public function tearDown() {
 		parent::tearDown();
-		$this->unlinkSampleImage();
+		//$this->unlinkSampleImage();
 	}
 
 	private function unlinkSampleImage() {
@@ -55,6 +59,12 @@ class ThumborTest extends SapphireTest {
 
 	private function getSampleImage() {
 		return $this->image;
+	}
+
+	private function getRemoteImageDimensions($url, &$width, &$height) {
+		$meta = getimagesize($url);
+		$width = isset($meta[0]) ? $meta[0] : -1;
+		$height = isset($meta[1]) ? $meta[1] : -1;
 	}
 
 	public function testHasGenerationKey() {
@@ -85,18 +95,18 @@ class ThumborTest extends SapphireTest {
 
 		$this->assertEquals($url, $instance_url);
 
-		// Download the URL and test its size
-		$meta = getimagesize($url);
+		$this->getRemoteImageDimensions($url, $width, $height);
 
-		$this->assertEquals($meta[0], self::WIDTH);
-		$this->assertEquals($meta[1], self::HEIGHT);
+		$this->assertEquals($width, self::WIDTH);
+		$this->assertEquals($height, self::HEIGHT);
 
 		// Test that the _resampled thumb DOES NOT exist locally in /assets, which is the point of Thumbor
-		$cache_file_name = $image->cacheFilename('Pad', self::WIDTH, self::HEIGHT, $colour);
-		$this->assertTrue(!empty($cache_file_name));
-		// The image should not exist in this location
-		$filesystem_path = Director::baseFolder() . "/" . $cache_file_name;
-		$this->assertTrue( !file_exists($filesystem_path) );
+		$variant_name = $image->variantName('Pad', self::WIDTH, self::HEIGHT, $colour);
+		$filename = $image->getFilename();
+		$hash = $image->getHash();
+		$exists = $this->asset_store->exists($filename, $hash, $variant_name);
+
+		$this->assertTrue( !$exists, "The variant name exists and it should not" );
 
 	}
 
@@ -113,8 +123,6 @@ class ThumborTest extends SapphireTest {
 		$height = floor(self::HEIGHT/2);
 		$width = self::WIDTH;
 		$thumb = $image->Align('left','top')->Fill( $width, $height );
-		$this->assertEquals( $image->getHalign(), 'left');
-		$this->assertEquals( $image->getValign(), 'top');
 
 		// Get its URL
 		$url = $thumb->getAbsoluteURL();
@@ -245,6 +253,7 @@ class ThumborTest extends SapphireTest {
 	/**
 	 * Test manual crop from corners
 	 * @todo CroppedFocus crop test
+	 * @todo failing test - HTTP 599: Port number out of range, culprit seems to be /20x20:-40x-40/ being the crop filter
 	 */
 	public function testManualCropFromCorners() {
 		$image = $this->getSampleImage();
@@ -254,7 +263,6 @@ class ThumborTest extends SapphireTest {
 			$image->ensureLocalFile();
 		}
 
-		$original_path = $image->getFullPath();
 		$original_url = $image->getAbsoluteURL();
 
 		$in_from_left = 20;
@@ -262,9 +270,8 @@ class ThumborTest extends SapphireTest {
 		$in_from_right = 40;
 		$in_from_bottom = 40;
 
-		$meta_original = getimagesize($original_path);
-		$width_original = $meta_original[0];
-		$height_original = $meta_original[1];
+		$width_original = $image->getWidth();
+		$height_original = $image->getHeight();
 
 		$bottom_right_x = $width_original - $in_from_right;
 		$bottom_right_y = $height_original - $in_from_bottom;
@@ -280,10 +287,10 @@ class ThumborTest extends SapphireTest {
 		// should end with this command/path
 		$this->assertStringEndsWith("=/{$in_from_left}x{$in_from_top}:{$bottom_right_x}x{$bottom_right_y}/{$original_url}", $url);
 
-		$meta = getimagesize($url);
+		$this->getRemoteImageDimensions($url, $returned_width_thumb, $returned_height_thumb);
 
-		$this->assertEquals( $meta[0], $width_thumb );// width
-		$this->assertEquals( $meta[1], $height_thumb );// height
+		$this->assertEquals( $returned_width_thumb, $width_thumb );// width
+		$this->assertEquals( $returned_height_thumb, $height_thumb );// height
 
 	}
 
