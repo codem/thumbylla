@@ -2,11 +2,11 @@
 namespace Codem\Thumbor;
 use SilverStripe\Forms\Fieldlist;
 use SilverStripe\Forms\CompositeField;
-use SilverStripe\Forms\LiteralField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Forms\HiddenField;
 use SilverStripe\Forms\TextField;
+use SilverStripe\Forms\TextareaField;
 use SilverStripe\Forms\FormField;
-use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\View\Requirements;
 
@@ -17,7 +17,7 @@ use SilverStripe\View\Requirements;
  */
 class ManualCropField extends FieldGroup {
 
-	private $image;
+	protected $image;
 
 	protected $schemaComponent = 'ManualCropField';
 	protected $schemaDataType = FormField::SCHEMA_DATA_TYPE_CUSTOM;
@@ -25,15 +25,17 @@ class ManualCropField extends FieldGroup {
 	/**
 	 * @param Image $image the original image to crop
 	 */
-	public function __construct($name, $title = null, SS_Image $image = null) {
-		$this->image = $image;
-		$fields = $this->getCropDataField($name);
-		$this->setName($name)->setValue('');
-		parent::__construct($title, $fields);
+	public function __construct($name, $title = '', SS_Image $image) {
+		$this->setImage($image);
+		$fields = $this->getManualCropFields($name);
+		$this->setName($name);
+		$this->setValue('');
+		parent::__construct( $title, $fields );
 	}
 
 	public function setImage(SS_Image $image) {
 		$this->image = $image;
+		return $this;
 	}
 
 	public function getImage() {
@@ -43,18 +45,20 @@ class ManualCropField extends FieldGroup {
 
 	public function getSchemaStateDefaults() {
 		$state = parent::getSchemaStateDefaults();
+		$state['data']['ManualCropData'] = '';
+		$state['data']['ImageURL'] = '';
 		if(!empty($this->image->ID) && $this->image instanceof SS_Image) {
-			$state['data'] += [
-				'cropdata' => $this->image->getSerialisedCropData(),
-				'cropdataraw' => $this->image->getCropData()
-			];
+			$state['data']['ManualCropData'] = $this->image->getSerialisedCropData();
+			$state['data']['ImageURL'] = $this->image->getAbsoluteURL();
 		}
 		$state['data']['foo'] = 'bar';
 		return $state;
 	}
 
-	public function getCropDataField($name) {
-		$field = TextField::create("ManualCropField_{$name}_CropData");
+	/**
+	 */
+	public function getManualCropFields($name) {
+		$field = TextareaField::create($name, '');
 		if(!empty($this->image->ID) && $this->image instanceof SS_Image) {
 			$field->setValue( $this->image->getSerialisedCropData() );
 		}

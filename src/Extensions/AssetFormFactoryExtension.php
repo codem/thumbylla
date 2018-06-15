@@ -14,12 +14,10 @@ class AssetFormFactoryExtension extends Extension {
 	 */
 	public function updateFormFields($fields, $controller, $formName, $context) {
 		$record = isset($context['Record']) ? $context['Record'] : null;
-		syslog(LOG_INFO, "***updateFormFields ***" . get_class($record));
 		if(!$record instanceof SS_Image) {
-			syslog(LOG_INFO, "Not an SS_Image instance! got:" . get_class($this->owner));
 			return;
 		}
-		$field = ManualCropField::create('Crop','Crop', $record );
+		$field = ManualCropField::create('ManualCropData', '', $record);
 		$fields->addFieldToTab('Editor.Crop', $field);
 
 	}
