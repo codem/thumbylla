@@ -9,29 +9,45 @@ class ManualCropField extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ManualCropData: props.data ? props.data.ManualCropData : '',
-      ImageURL: props.data ? props.data.ImageURL : '',
+      ManualCropData: props.data ? props.data.ManualCropData : {}
     };
   }
 
-  _crop() {
+  _crop() {}
 
-    const {FieldGroup, children, onAutofill, name} = this.props;
+  _cropend() {
 
+    const {children, onAutofill, name} = this.props;
+
+    //save data to child field
     var child = children[0];//save field
     var cropdata = this.refs.cropper.getData();
     var save = {
-      width : cropdata.width ? Math.round(cropdata.width) : 0,
-      height : cropdata.height ? Math.round(cropdata.height) : 0,
       x : cropdata.x ? Math.round(cropdata.x) : 0,
       y : cropdata.y ? Math.round(cropdata.y) : 0,
+      width : cropdata.width ? Math.round(cropdata.width) : 0,
+      height : cropdata.height ? Math.round(cropdata.height) : 0,
       rotate : cropdata.rotate ? Math.round(cropdata.rotate) : 0,
       scaleX : cropdata.scaleX ? Math.round(cropdata.scaleX) : 0,
       scaleY : cropdata.scaleY ? Math.round(cropdata.scaleY) : 0,
     };
-    var savedata = JSON.stringify(save);
-    onAutofill(child.props.name, savedata);
 
+    onAutofill(child.props.name, JSON.stringify(save));
+
+    this.setState({
+      ManualCropData : save
+    });
+
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    if (nextState.ManualCropData.x == this.state.ManualCropData.x
+          && nextState.ManualCropData.y == this.state.ManualCropData.y
+          && nextState.ManualCropData.width == this.state.ManualCropData.width
+          && nextState.ManualCropData.height == this.state.ManualCropData.height
+    ) {
+      return false;
+    }
   }
 
   renderChildren(children) {
@@ -40,28 +56,34 @@ class ManualCropField extends Component {
 
   render() {
 
-    const {FieldGroup, children} = this.props;
-    const {ImageURL, ManualCropData} = this.state;
+    const {children, data} = this.props;
 
-    var cropdata = {};
-    try {
-      cropdata = JSON.parse(ManualCropData);
-    } catch (e) {
-      console.log('B.A.D JSON');
+    var manual_crop_data = {};
+    if(this.state && 'ManualCropData' in this.state) {
+      manual_crop_data = this.state.ManualCropData;
+    } else if('ManualCropData' in data) {
+      manual_crop_data = data.ManualCropData;
+    }
+
+    var image_url = '';
+    if(this.state && 'ImageURL' in this.state) {
+      image_url = this.state.ImageURL;
+    } else if('ImageURL' in data) {
+      image_url = data.ImageURL;
     }
 
     return (
       <div data-cropper="1">
       <Cropper
         ref='cropper'
-        src={ImageURL}
+        src={image_url}
         style={{height: 'auto', width: '100%'}}
         // Cropper.js options
         minContainerWidth={400}
         minContainerHeight={300}
         aspectRatio={NaN}
-        guides={false}
-        viewMode={1}
+        guides={true}
+        viewMode={2}
         dragMode='crop'
         autoCrop={true}
         movable={true}
@@ -72,7 +94,8 @@ class ManualCropField extends Component {
         zoomOnWheel={false}
         checkOrientation={false}
         autoCropArea={0.5}
-        data={cropdata}
+        data={manual_crop_data}
+        cropend={this._cropend.bind(this)}
         crop={this._crop.bind(this)} />
         {this.renderChildren(children)}
       </div>

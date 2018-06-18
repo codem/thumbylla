@@ -68,46 +68,22 @@
 /************************************************************************/
 /******/ ({
 
-/***/ "./client/src/boot/applyTransform.js":
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_i18n__ = __webpack_require__(3);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_i18n___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_i18n__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lib_Injector__ = __webpack_require__(1);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_lib_Injector___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_lib_Injector__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3_components_ManualCropField__ = __webpack_require__("./client/src/components/ManualCropField.jsx");
-
-
-
-
-
-var applyTransform = function applyTransform() {};
-
-/* unused harmony default export */ var _unused_webpack_default_export = (applyTransform);
-
-/***/ }),
-
 /***/ "./client/src/boot/index.js":
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lib_Injector__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__applyTransform__ = __webpack_require__("./client/src/boot/applyTransform.js");
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_3__registerComponents__ = __webpack_require__("./client/src/boot/registerComponents.js");
-
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_2__registerComponents__ = __webpack_require__("./client/src/boot/registerComponents.js");
 
 
 
 
 document.addEventListener('DOMContentLoaded', function () {
-  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_3__registerComponents__["a" /* default */])();
+  __webpack_require__.i(__WEBPACK_IMPORTED_MODULE_2__registerComponents__["a" /* default */])();
 });
 
 /***/ }),
@@ -116,7 +92,7 @@ document.addEventListener('DOMContentLoaded', function () {
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lib_Injector__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lib_Injector__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_lib_Injector___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_lib_Injector__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_components_ManualCropField__ = __webpack_require__("./client/src/components/ManualCropField.jsx");
 
@@ -135,9 +111,9 @@ var registerComponents = function registerComponents() {
 
 "use strict";
 /* unused harmony export Component */
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(0);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react__ = __webpack_require__(1);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_react___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_react__);
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector__ = __webpack_require__(1);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector__ = __webpack_require__(0);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_1_lib_Injector___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_1_lib_Injector__);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_classnames__ = __webpack_require__(2);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_2_classnames___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_2_classnames__);
@@ -165,35 +141,46 @@ var ManualCropField = function (_Component) {
     var _this = _possibleConstructorReturn(this, (ManualCropField.__proto__ || Object.getPrototypeOf(ManualCropField)).call(this, props));
 
     _this.state = {
-      ManualCropData: props.data ? props.data.ManualCropData : '',
-      ImageURL: props.data ? props.data.ImageURL : ''
+      ManualCropData: props.data ? props.data.ManualCropData : {}
     };
     return _this;
   }
 
   _createClass(ManualCropField, [{
     key: '_crop',
-    value: function _crop() {
+    value: function _crop() {}
+  }, {
+    key: '_cropend',
+    value: function _cropend() {
       var _props = this.props,
-          FieldGroup = _props.FieldGroup,
           children = _props.children,
           onAutofill = _props.onAutofill,
           name = _props.name;
 
-
       var child = children[0];
       var cropdata = this.refs.cropper.getData();
       var save = {
-        width: cropdata.width ? Math.round(cropdata.width) : 0,
-        height: cropdata.height ? Math.round(cropdata.height) : 0,
         x: cropdata.x ? Math.round(cropdata.x) : 0,
         y: cropdata.y ? Math.round(cropdata.y) : 0,
+        width: cropdata.width ? Math.round(cropdata.width) : 0,
+        height: cropdata.height ? Math.round(cropdata.height) : 0,
         rotate: cropdata.rotate ? Math.round(cropdata.rotate) : 0,
         scaleX: cropdata.scaleX ? Math.round(cropdata.scaleX) : 0,
         scaleY: cropdata.scaleY ? Math.round(cropdata.scaleY) : 0
       };
-      var savedata = JSON.stringify(save);
-      onAutofill(child.props.name, savedata);
+
+      onAutofill(child.props.name, JSON.stringify(save));
+
+      this.setState({
+        ManualCropData: save
+      });
+    }
+  }, {
+    key: 'shouldComponentUpdate',
+    value: function shouldComponentUpdate(nextProps, nextState) {
+      if (nextState.ManualCropData.x == this.state.ManualCropData.x && nextState.ManualCropData.y == this.state.ManualCropData.y && nextState.ManualCropData.width == this.state.ManualCropData.width && nextState.ManualCropData.height == this.state.ManualCropData.height) {
+        return false;
+      }
     }
   }, {
     key: 'renderChildren',
@@ -204,18 +191,22 @@ var ManualCropField = function (_Component) {
     key: 'render',
     value: function render() {
       var _props2 = this.props,
-          FieldGroup = _props2.FieldGroup,
-          children = _props2.children;
-      var _state = this.state,
-          ImageURL = _state.ImageURL,
-          ManualCropData = _state.ManualCropData;
+          children = _props2.children,
+          data = _props2.data;
 
 
-      var cropdata = {};
-      try {
-        cropdata = JSON.parse(ManualCropData);
-      } catch (e) {
-        console.log('B.A.D JSON');
+      var manual_crop_data = {};
+      if (this.state && 'ManualCropData' in this.state) {
+        manual_crop_data = this.state.ManualCropData;
+      } else if ('ManualCropData' in data) {
+        manual_crop_data = data.ManualCropData;
+      }
+
+      var image_url = '';
+      if (this.state && 'ImageURL' in this.state) {
+        image_url = this.state.ImageURL;
+      } else if ('ImageURL' in data) {
+        image_url = data.ImageURL;
       }
 
       return __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(
@@ -223,14 +214,14 @@ var ManualCropField = function (_Component) {
         { 'data-cropper': '1' },
         __WEBPACK_IMPORTED_MODULE_0_react___default.a.createElement(__WEBPACK_IMPORTED_MODULE_3_react_cropper___default.a, {
           ref: 'cropper',
-          src: ImageURL,
+          src: image_url,
           style: { height: 'auto', width: '100%' },
 
           minContainerWidth: 400,
           minContainerHeight: 300,
           aspectRatio: NaN,
-          guides: false,
-          viewMode: 1,
+          guides: true,
+          viewMode: 2,
           dragMode: 'crop',
           autoCrop: true,
           movable: true,
@@ -241,7 +232,8 @@ var ManualCropField = function (_Component) {
           zoomOnWheel: false,
           checkOrientation: false,
           autoCropArea: 0.5,
-          data: cropdata,
+          data: manual_crop_data,
+          cropend: this._cropend.bind(this),
           crop: this._crop.bind(this) }),
         this.renderChildren(children)
       );
@@ -4361,7 +4353,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
             'Use `PropTypes.checkPropTypes()` to call them. ' +
             'Read more at http://fb.me/use-check-prop-types'
           );
-        } else if ("process.env.NODE_ENV" !== 'production' && typeof console !== 'undefined') {
+        } else if ("development" !== 'production' && typeof console !== 'undefined') {
           // Old behavior for people using React.PropTypes
           var cacheKey = componentName + ':' + propName;
           if (
@@ -4811,7 +4803,7 @@ var _extends = Object.assign || function (target) { for (var i = 1; i < argument
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(0);
+var _react = __webpack_require__(1);
 
 var _react2 = _interopRequireDefault(_react);
 
@@ -5198,14 +5190,14 @@ exports.default = ReactCropper;
 /***/ 0:
 /***/ (function(module, exports) {
 
-module.exports = React;
+module.exports = Injector;
 
 /***/ }),
 
 /***/ 1:
 /***/ (function(module, exports) {
 
-module.exports = Injector;
+module.exports = React;
 
 /***/ }),
 
@@ -5213,13 +5205,6 @@ module.exports = Injector;
 /***/ (function(module, exports) {
 
 module.exports = classnames;
-
-/***/ }),
-
-/***/ 3:
-/***/ (function(module, exports) {
-
-module.exports = i18n;
 
 /***/ })
 

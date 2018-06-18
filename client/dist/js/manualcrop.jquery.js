@@ -7,7 +7,6 @@
 			onmatch: function() {
 				var data = $(this).data('manualcropdata');
 				var saveto = $(this).parents('.CompositeField:first').find('input[name="ManualCropData"]:first');
-				console.log(saveto);
 				var img = $(this).children('img')[0];
 				var cropper = new Cropper( img, {
 					viewMode: 1,
