@@ -1,6 +1,7 @@
 <?php
 namespace Codem\Thumbor;
 use SilverStripe\ORM\DataExtension;
+use SilverStripe\ORM\DataObject;
 use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Forms\Fieldlist;
 
@@ -12,6 +13,16 @@ class ManualCropImageExtension extends DataExtension {
 	private static $db = [
 		'ManualCropData' => 'Varchar(255)',// JSON data for croppr.js, keys are x,y, width and height
 	];
+
+	/**
+	 * If the File Hash changes, the file has been changed, the crop data should be reset
+	 */
+	public function onBeforeWrite() {
+		parent::onBeforeWrite();
+		if ($this->owner->isChanged('FileHash', DataObject::CHANGE_VALUE)) {
+			$this->owner->ManualCropData = null;
+		}
+	}
 
 	/**
 	 * getCropData
