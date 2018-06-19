@@ -26,13 +26,6 @@ class Image extends SS_Image {
 		$this->image_backend->setImage($this);
 	}
 
-	public function getCMSFields() {
-		syslog(LOG_INFO, "***getCMSFields PRE ***");
-		$fields = parent::getCmsFields();
-		syslog(LOG_INFO, "***getCMSFields POST ***");
-		return $fields;
-	}
-
 	public function getImageBackend() {
 		return $this->image_backend;
 	}
