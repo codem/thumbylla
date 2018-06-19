@@ -79,7 +79,7 @@ class ManualCropField extends Component {
     }
 
     return (
-      <div data-cropper="1">
+      <div className="manual-cropper-container">
       <Cropper
         ref='cropper'
         src={image_url}
@@ -89,7 +89,7 @@ class ManualCropField extends Component {
         minContainerHeight={300}
         aspectRatio={NaN}
         guides={true}
-        viewMode={2}
+        viewMode={1}
         dragMode='crop'
         autoCrop={true}
         movable={true}

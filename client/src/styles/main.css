@@ -1,5 +1,10 @@
-.cropper-canvas > img {
-  width : 100% !important;
+.manual-cropper-container {
+  max-height : 300px;
+}
+
+.manual-cropper-container img {
+  max-width : 100%;
+  max-height : 300px;
 }
 
 .cropper-container {

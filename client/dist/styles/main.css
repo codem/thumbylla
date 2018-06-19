@@ -1,1 +1,1 @@
-.cropper-canvas>img{width:100%!important}.cropper-container{margin:0 auto}textarea.manualcropdata{display:none}
+.manual-cropper-container{max-height:300px}.manual-cropper-container img{max-width:100%;max-height:300px}.cropper-container{margin:0 auto}textarea.manualcropdata{display:none}
