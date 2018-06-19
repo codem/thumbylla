@@ -6,8 +6,6 @@ use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Assets\Image_Backend As SS_Image_Backend;
 use SilverStripe\Assets\Storage\AssetContainer;
 use SilverStripe\Core\Config\Config;
-use SilverStripe\Assets\InterventionBackend;
-use SilverStripe\Core\Flushable;
 use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
 
@@ -16,7 +14,7 @@ use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
  * Remember, the actual 'backend' is the Thumbor Server, all we do is create image URLs ;)
  * @package thumbylla
  */
-class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Backend, Flushable {
+class ThumbyllaImageBackend implements SS_Image_Backend {
 
 
 	/**
@@ -24,18 +22,47 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 	 */
 	private $thumbor_url;
 
-	private $image;
+	private $image;//deprecated
 
 	private $halign = "center";
 	private $valign = "middle";
 
-	private $_cache_width = 0;//the width of the original image uploaded
-	private $_cache_height = 0;//the height of the original image uploaded
+	/**
+	 * @var AssetContainer
+	 */
+	private $container;
 
-	public function setImage(SS_Image $image) {
-		$this->image = $image;
+	/**
+	 * Create a new backend with the given object
+	 *
+	 * @param AssetContainer $assetContainer Object to load from
+	 */
+	public function __construct(AssetContainer $assetContainer = null) {
+		$this->setAssetContainer($assetContainer);
 	}
 
+	/**
+	 * @param AssetContainer $assetContainer
+	 *
+	 * @return $this
+	 */
+	public function setAssetContainer($assetContainer)
+	{
+			$this->container = $assetContainer;
+			return $this;
+	}
+
+	/**
+	 * @return int The width of the image
+	 */
+	public function getWidth() {}
+
+	/**
+	 * @return int The height of the image
+	 */
+	public function getHeight() {
+
+	}
 	/**
 	 * Based on config, pick a server to serve an image
 	 * @returns string
@@ -83,7 +110,7 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 	 * @returns Thumbor\Url\Builder
 	 */
 	private function generateUrlInstance() {
-		if(!$this->image) {
+		if(!$this->container) {
 			return null;
 		}
 
@@ -91,7 +118,7 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 		$protocol = $this->getProtocol();
 		$secret = $this->getSecretKey();
 
-		$image_url = $this->image->getAbsoluteURL();
+		$image_url = $this->container->getAbsoluteURL();
 		$this->signURL($backend_host, $image_url);
 
 		$inst = ThumborUrlBuilder::construct($protocol . $backend_host, $secret, $image_url);
@@ -160,26 +187,6 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 	}
 
 	/**
-	 * Return the width of the original image
-	 */
-	public function getOriginalWidth() {
-		if(!$this->_cache_width) {
-			$this->_cache_width = parent::getWidth();
-		}
-		return $this->_cache_width;
-	}
-
-	/**
-	 * Return the height of the original image
-	 */
-	public function getOriginalHeight() {
-		if(!$this->_cache_height) {
-			$this->_cache_height = parent::getHeight();
-		}
-		return $this->_cache_height;
-	}
-
-	/**
 	 * Align the crop (for Fill/CroppedImage)
 	 * @param string $halign one of center, left, right
  	 * @param string $valign one of middle, top, bottom
@@ -239,22 +246,24 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 
 	/**
 	 * Shortcut method to crop an image from its edges, e.g 20,20,20,20 crops the image 20 pixels in from each edge
-	 * @param int $in_from_left pixels in from the left edge
-	 * @param int $in_from_top pixels in from the top edge
-	 * @param int $in_from_right pixels in from the right edge
-	 * @param int $in_from_bottom pixels in from the bottom edge
-	 * @todo ensureLocalFile from cdncontent ?
+	 * @param int $top_left_x pixels in from the left edge
+	 * @param int $top_left_y pixels in from the top edge
+	 * @param int $bottom_right_x pixels in from the right edge
+	 * @param int $bottom_right_y pixels in from the bottom edge
 	 */
-	public function ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom) {
+	public function ManualCropFromCorners($top_left_x, $top_left_y, $bottom_right_x, $bottom_right_y) {
 
-		$width = $this->getOriginalWidth();
-		$height = $this->getOriginalHeight();
-		// calculate the bottom/right/x|y values
-		$bottom_right_x = $width - $in_from_right;
-		$bottom_right_y = $height - $in_from_bottom;
+		if($top_left_x <= 0
+				|| $top_left_y <= 0
+				|| $bottom_right_x <= 0
+				|| $bottom_right_y <= 0
+		) {
+			// cannot have any negative numbers, causes issues with Tornado parsing as a port
+			return $this;
+		}
 
 		$this->UrlInstance();
-		$this->thumbor_url->crop($in_from_left, $in_from_top, $bottom_right_x, $bottom_right_y);
+		$this->thumbor_url->crop($top_left_x, $top_left_y, $bottom_right_x, $bottom_right_y);
 		return $this;
 	}
 
@@ -405,7 +414,7 @@ class ThumbyllaImageBackend extends InterventionBackend implements SS_Image_Back
 		*/
 
 		// return an instance that can be used in a template call
-		return new ThumboredImage( $this->thumbor_url, $this->image->Title, $this->image->Filename );
+		return new ThumboredImage( $this->thumbor_url, $this->container->Title, $this->container->Filename );
 	}
 
 	/**

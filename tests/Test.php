@@ -10,7 +10,7 @@ use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Assets\File;
 use SilverStripe\Assets\Folder;
 use SilverStripe\Control\Director;
-use SilverStripe\Forms\CompositeField;
+use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Assets\Storage\AssetStore;
 
 /**
@@ -259,10 +259,6 @@ class ThumborTest extends SapphireTest {
 		$image = $this->getSampleImage();
 		$this->assertTrue( !empty($image->ID) && $image->exists() );
 
-		if($image->hasMethod('ensureLocalFile')) {
-			$image->ensureLocalFile();
-		}
-
 		$original_url = $image->getAbsoluteURL();
 
 		$in_from_left = 20;
@@ -300,11 +296,11 @@ class ThumborTest extends SapphireTest {
 	public function testManualCropField() {
 		$image = $this->getSampleImage();
 		$this->assertTrue( !empty($image->ID) && $image->exists() );
+		$cropper = new ManualCropField( 'TestManualCropData', '', $image );
+		$this->assertTrue( $cropper instanceof FieldGroup );
+		$fields = $cropper->getManualCropFields('TestManualCropData');
 
-		$cropper = new ManualCropField( $image );
-		$field = $cropper->getField();
-
-		$this->assertTrue($field instanceof CompositeField);
+		$this->assertTrue( !empty($fields) );
 
 	}
 

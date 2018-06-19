@@ -5,6 +5,7 @@ use Thumbor\Url\Builder As ThumborUrlBuilder;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Assets\Storage\AssetStore;
+use Intervention\Image\ImageManagerStatic;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
@@ -16,14 +17,16 @@ class Image extends SS_Image {
 
 	private $image_backend = null;
 
+	private $_cache_width = 0;//the width of the original image uploaded
+	private $_cache_height = 0;//the height of the original image uploaded
+
 	public function __construct($record = null, $isSingleton = false, $queryParams = array()) {
 		parent::__construct($record, $isSingleton, $queryParams);
 		if($this->getVisibility() == AssetStore::VISIBILITY_PROTECTED) {
-			$this->image_backend = new ThumbyllaProtectedImageBackend();
+			$this->image_backend = new ThumbyllaProtectedImageBackend($this);
 		} else {
-			$this->image_backend = new ThumbyllaImageBackend();
+			$this->image_backend = new ThumbyllaImageBackend($this);
 		}
-		$this->image_backend->setImage($this);
 	}
 
 	public function getImageBackend() {
@@ -35,6 +38,40 @@ class Image extends SS_Image {
 	 */
 	public function getUrlInstance() {
 		return $this->getImageBackend()->getUrlInstance();
+	}
+
+	public function getWidth($force = false) {
+		if($this->_cache_width && !$force) {
+			return $this->_cache_width;
+		}
+
+		try {
+			$stream = $this->getStream();
+			$im = ImageManagerStatic::make($stream);
+			$width = $im->getWidth();
+			$this->_cache_width = $width;
+			return $this->_cache_width;
+		} catch (\Exception $e) {
+
+		}
+		return 0;
+	}
+
+	public function getHeight($force = false) {
+		if($this->_cache_height && !$force) {
+			return $this->_cache_height;
+		}
+
+		try {
+			$stream = $this->getStream();
+			$im = ImageManagerStatic::make($stream);
+			$height = $im->getWidth();
+			$this->_cache_height = $height;
+			return $this->_cache_height;
+		} catch (\Exception $e) {
+
+		}
+		return 0;
 	}
 
 	/**
@@ -123,14 +160,27 @@ class Image extends SS_Image {
 
 	/**
 	 * Shortcut method to crop an image from its edges, e.g 20,20,20,20 crops the image 20 pixels in from each edge
-	 * @param int $in_from_left pixels in from the left edge
-	 * @param int $in_from_top pixels in from the top edge
-	 * @param int $in_from_right pixels in from the right edge
-	 * @param int $in_from_bottom pixels in from the bottom edge
-	 * @todo ensureLocalFile from cdncontent ?
+	 * @param int $in_from_left pixels in from the left edge (>0)
+	 * @param int $in_from_top pixels in from the top edge (>0)
+	 * @param int $in_from_right pixels in from the right edge (>0)
+	 * @param int $in_from_bottom pixels in from the bottom edge (>0)
 	 */
 	public function ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom) {
-		$backend = $this->getImageBackend()->ManualCropFromCorners($in_from_left, $in_from_top, $in_from_right, $in_from_bottom);
+
+		$width = $this->getWidth();
+		$height = $this->getHeight();
+
+		syslog(LOG_INFO, $width . ":" . $height);
+		// calculate the bottom/right/x|y values
+		$bottom_right_x = $width - $in_from_right;
+		$bottom_right_y = $height - $in_from_bottom;
+
+		$top_left_x = $in_from_left;
+		$top_left_y = $in_from_top;
+
+		syslog(LOG_INFO, $bottom_right_x . ":" . $bottom_right_y);
+
+		$backend = $this->getImageBackend()->ManualCropFromCorners($top_left_x, $top_left_y, $bottom_right_x, $bottom_right_y);
 		return $this;
 	}
 
