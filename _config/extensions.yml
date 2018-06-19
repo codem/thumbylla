@@ -3,7 +3,7 @@ Name: thumbor_extensions
 ---
 SilverStripe\Assets\File:
   extensions:
-    - 'Codem\Thumbor\ImageExtension'
+    - 'Codem\Thumbor\ManualCropImageExtension'
 SilverStripe\AssetAdmin\Forms\AssetFormFactory:
   extensions:
     - 'Codem\Thumbor\AssetFormFactoryExtension'

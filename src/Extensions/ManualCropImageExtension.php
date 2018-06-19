@@ -7,7 +7,7 @@ use SilverStripe\Forms\Fieldlist;
 /**
  * This {@link \DataExtension} provides storage for manual cropping via {@link Codem\Thumbor\ManualCropField}
  */
-class ImageExtension extends DataExtension {
+class ManualCropImageExtension extends DataExtension {
 
 	private static $db = [
 		'ManualCropData' => 'Varchar(255)',// JSON data for croppr.js, keys are x,y, width and height
@@ -19,7 +19,7 @@ class ImageExtension extends DataExtension {
 	 */
 	public function getCropData() {
 		$data = [];
-		if(!$this->owner instanceof SS_Image) {
+		if(!($this->owner instanceof SS_Image)) {
 			return $data;
 		}
 		if($this->owner->ManualCropData) {

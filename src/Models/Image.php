@@ -149,7 +149,7 @@ class Image extends SS_Image {
 
 	/**
 	 * Return a {@link Codem\Thumbor\Image} with a focal filter set based on the date returned from ManualCropData
-	 * @see {@link Codem\Thumbor\ImageExtension}
+	 * @see {@link Codem\Thumbor\ManualCropImageExtension}
 	 * @returns Codem\Thumbor\Image
 	 */
 	public function CroppedFocus() {
