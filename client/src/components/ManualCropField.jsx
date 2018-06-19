@@ -2,7 +2,6 @@ import React, { PropTypes, Component, Children, cloneElement } from 'react';
 import { inject } from 'lib/Injector';
 import classNames from 'classnames';
 import Cropper from 'react-cropper';
-//import 'cropperjs/dist/cropper.css';
 
 class ManualCropField extends Component {
 

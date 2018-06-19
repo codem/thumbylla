@@ -5,7 +5,7 @@ After:
 ---
 SilverStripe\Admin\LeftAndMain:
   extra_requirements_css:
-    - 'codem/thumbylla: client/lib/cropperjs/dist/cropper.min.css'
-    - 'codem/thumbylla: client/dist/css/main.css'
+    - 'codem/thumbylla: client/dist/styles/cropperjs.css'
+    - 'codem/thumbylla: client/dist/styles/main.css'
   extra_requirements_javascript:
     - 'codem/thumbylla: client/dist/js/main.js'

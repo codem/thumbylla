@@ -16,8 +16,7 @@
 		"installer-name": "thumbylla",
 		"expose": [
 				"client/dist/js",
-				"client/dist/css",
-				"client/lib/cropperjs/dist"
+				"client/dist/styles"
 		]
 	},
 	"require": {

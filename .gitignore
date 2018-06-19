@@ -1,1 +1,3 @@
 node_modules/
+yarn-error.log
+client/dist/js/main.js.map

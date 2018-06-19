@@ -187,8 +187,17 @@ File:
 ```
 Once enabled, newly uploaded images will have a ClassName of ```Codem\Thumbor\Image```
 
-## Libraries
-This module [makes use of cropperjs](https://github.com/fengyuanchen/cropperjs) (./lib/cropperjs)
+## Libraries + Building
+This module [makes use of cropperjs](https://github.com/fengyuanchen/cropperjs) and [react-cropper](https://github.com/roadmanfong/react-cropper) for image cropping and focal point handling.
 
-### License
+All required assets are in client/dist/js|styles.
+If you want to build your own you will need Node and Yarn, then:
+```
+$ cd vendor\codem\thumbylla
+$ yarn install
+```
+You can then run ```yarn run build`` or ```yarn run watch```, for instance.
+
+
+### Licence
 See LICENCE

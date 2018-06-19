@@ -16,7 +16,7 @@
      "lint": "eslint client/src && sass-lint -v client/src"
    },
   "devDependencies": {
-    "@silverstripe/webpack-config": "^0.7"
+    "@silverstripe/webpack-config": "^0.8"
   },
   "dependencies": {
     "react": "^15.3.1",
@@ -24,5 +24,11 @@
     "react-redux": "^4.4.5",
     "redux": "^3.3.1",
     "react-cropper": "^1.0"
+  },
+  "babel": {
+    "presets": [
+      "env",
+      "react"
+    ]
   }
 }
