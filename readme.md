@@ -170,22 +170,8 @@ Codem\Thumbor\Config:
 
 ## Known Issues
 
-> The following may no longer be valid for SS4
+1. Switching between tile/list view in the asset admin will cause non-published images to return 404 if the URL has expired. This is because the images are re-requested by the browser. Clicking on the image will cause a new image with an updated expiry to be created.
 
-UploadField creates an instance of ```Image``` and then attempts to create the thumbnail post upload as an instance of ```Image_Cached```.
-In this case the 40px thumbnail image will not display in the upload element.
-
-You can workaround this by enabling the following ```class_for_file_extension``` config in your project YML:
-```
-File:
-  class_for_file_extension:
-    'jpg': 'Codem\Thumbor\Image'
-    'jpeg': 'Codem\Thumbor\Image'
-    'gif': 'Codem\Thumbor\Image'
-    'png': 'Codem\Thumbor\Image'
-    'webp': 'Codem\Thumbor\Image'
-```
-Once enabled, newly uploaded images will have a ClassName of ```Codem\Thumbor\Image```
 
 ## Libraries + Building
 This module [makes use of cropperjs](https://github.com/fengyuanchen/cropperjs) and [react-cropper](https://github.com/roadmanfong/react-cropper) for image cropping and focal point handling.
