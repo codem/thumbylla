@@ -8,7 +8,9 @@ class ManualCropField extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      ManualCropData: props.data ? props.data.ManualCropData : {}
+      ManualCropData: props.data ? props.data.ManualCropData : {},
+      ImageURL: props.data ? props.data.ImageURL : '',
+      FileHash: props.data ? props.data.FileHash : ''
     };
   }
 
@@ -40,6 +42,11 @@ class ManualCropField extends Component {
   }
 
   shouldComponentUpdate(nextProps, nextState) {
+    // if the FileHash changes, re-render
+    if(nextProps.data.FileHash != this.props.data.FileHash) {
+      return true;
+    }
+    // if the crop data has not changed...
     if (nextState.ManualCropData.x == this.state.ManualCropData.x
           && nextState.ManualCropData.y == this.state.ManualCropData.y
           && nextState.ManualCropData.width == this.state.ManualCropData.width
@@ -65,10 +72,10 @@ class ManualCropField extends Component {
     }
 
     var image_url = '';
-    if(this.state && 'ImageURL' in this.state) {
-      image_url = this.state.ImageURL;
-    } else if('ImageURL' in data) {
+    if('ImageURL' in data) {
       image_url = data.ImageURL;
+    } else if(this.state && 'ImageURL' in this.state) {
+      image_url = this.state.ImageURL;
     }
 
     return (

@@ -44,11 +44,13 @@ class ManualCropField extends FieldGroup {
 
 	public function getSchemaStateDefaults() {
 		$state = parent::getSchemaStateDefaults();
-		$state['data']['ManualCropData'] = '';
+		$state['data']['ManualCropData'] = [];
 		$state['data']['ImageURL'] = '';
+		$state['data']['FileHash'] = '';
 		if(!empty($this->image->ID) && $this->image instanceof SS_Image) {
 			$state['data']['ManualCropData'] = $this->image->getCropData();
 			$state['data']['ImageURL'] = $this->image->getAbsoluteURL();
+			$state['data']['FileHash'] = $this->image->getHash();
 		}
 		return $state;
 	}

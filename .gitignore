@@ -1,3 +1,5 @@
 node_modules/
 yarn-error.log
 client/dist/js/main.js.map
+client/dist/styles/cropperjs.css.map
+client/dist/styles/main.css.map
