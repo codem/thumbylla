@@ -12,6 +12,7 @@ use SilverStripe\Assets\Folder;
 use SilverStripe\Control\Director;
 use SilverStripe\Forms\FieldGroup;
 use SilverStripe\Assets\Storage\AssetStore;
+use GuzzleHttp\Client;
 
 /**
  * Module tests
@@ -62,9 +63,23 @@ class ThumborTest extends SapphireTest {
 	}
 
 	private function getRemoteImageDimensions($url, &$width, &$height) {
-		$meta = getimagesize($url);
-		$width = isset($meta[0]) ? $meta[0] : -1;
-		$height = isset($meta[1]) ? $meta[1] : -1;
+		try {
+			$width = $height = -1;
+			$image = $this->getSampleImage();
+			$backend = $image->getImageBackend();
+			$response = $backend->getRemoteResponse($url, "GET", false);
+			$body = $response->getBody();
+			$path = tempnam(sys_get_temp_dir(), 'thumbylla_test');
+			$handle = fopen($path, 'w');
+			fwrite($handle, $body);
+			fclose($handle);
+			$meta = getimagesize($path);
+			unlink($path);
+			$width = isset($meta[0]) ? $meta[0] : -1;
+			$height = isset($meta[1]) ? $meta[1] : -1;
+		} catch (\Exception $e) {
+
+		}
 	}
 
 	public function testHasGenerationKey() {
@@ -255,7 +270,7 @@ class ThumborTest extends SapphireTest {
 	 * @todo CroppedFocus crop test
 	 * @todo failing test - HTTP 599: Port number out of range, culprit seems to be /20x20:-40x-40/ being the crop filter
 	 */
-	public function testManualCropFromCorners() {
+	public function testManualCornerCrop() {
 		$image = $this->getSampleImage();
 		$this->assertTrue( !empty($image->ID) && $image->exists() );
 
@@ -334,6 +349,11 @@ class ThumborTest extends SapphireTest {
 		$br = $x + $width;
 		$bl = $y + $height;
 		$this->assertStringEndsWith("=/{$x}x{$y}:{$br}x{$bl}/{$original_url}", $url);
+
+		$this->getRemoteImageDimensions($url, $returned_width_thumb, $returned_height_thumb);
+
+		$this->assertEquals( $returned_width_thumb, $width );// width
+		$this->assertEquals( $returned_height_thumb, $height );// height
 
 	}
 

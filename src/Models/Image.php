@@ -79,7 +79,7 @@ class Image extends SS_Image {
 		try {
 			$stream = $this->getStream();
 			$im = ImageManagerStatic::make($stream);
-			$height = $im->getWidth();
+			$height = $im->getHeight();
 			$this->_cache_height = $height;
 			return $this->_cache_height;
 		} catch (\Exception $e) {
