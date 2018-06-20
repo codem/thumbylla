@@ -8,6 +8,7 @@ use SilverStripe\Assets\Storage\AssetContainer;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
+use GuzzleHttp\Client;
 
 /**
  * An Image Backend for Thumbor-based image handling, replacing the InterventionBackend
@@ -16,6 +17,7 @@ use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
  */
 class ThumbyllaImageBackend implements SS_Image_Backend {
 
+	const USER_AGENT = "Thumbylla";
 
 	/**
 	 * @var Thumbor\Url\Builder
@@ -50,6 +52,25 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	{
 			$this->container = $assetContainer;
 			return $this;
+	}
+
+	/**
+	 * @param string $url
+	 * Returns a Guzzle\Http\Message\Response of the URL provided
+	 */
+	public function getRemoteResponse($url, $method = "GET") {
+		try {
+			$client = new Client();
+			$options = [
+				'headers' => [
+					'User-Agent' => self::USER_AGENT
+				]
+			];
+			$response = $client->request($method, $url, $options);
+			return $response;
+		} catch (\Exception $e) {
+		}
+		return null;
 	}
 
 	/**

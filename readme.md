@@ -170,9 +170,6 @@ Codem\Thumbor\Config:
 
 ## Known Issues
 
-1. Switching between tile/list view in the asset admin will cause non-published images to return 404 if the URL has expired. This is because the images are re-requested by the browser. Clicking on the image will cause a new image with an updated expiry to be created.
-
-
 ## Libraries + Building
 This module [makes use of cropperjs](https://github.com/fengyuanchen/cropperjs) and [react-cropper](https://github.com/roadmanfong/react-cropper) for image cropping and focal point handling.
 

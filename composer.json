@@ -21,7 +21,8 @@
 	},
 	"require": {
 		"silverstripe/framework" : "~4.0",
-		"99designs/phumbor" : "~1.2"
+		"99designs/phumbor" : "~1.2",
+		"guzzlehttp/guzzle" : "~6.0"
 	},
 	"require-dev": {
 		"phpunit/phpunit": "^3 || ^4 || ^5"

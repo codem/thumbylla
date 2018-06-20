@@ -29,17 +29,26 @@ class Image extends SS_Image {
 		}
 	}
 
+	/**
+	 * @returns object
+	 */
 	public function getImageBackend() {
 		return $this->image_backend;
 	}
 
 	/**
 	 * Helper method to get the current Thumbor URL Builder instance
+	 * @returns Thumbor\Url\Builder
 	 */
 	public function getUrlInstance() {
 		return $this->getImageBackend()->getUrlInstance();
 	}
 
+	/**
+	 * Return the width of the original image uploaded
+	 * @param boolean $force set to true to force retrieval
+	 * @returns int
+	 */
 	public function getWidth($force = false) {
 		if($this->_cache_width && !$force) {
 			return $this->_cache_width;
@@ -57,6 +66,11 @@ class Image extends SS_Image {
 		return 0;
 	}
 
+	/**
+	 * Return the height of the original image uploaded
+	 * @param boolean $force set to true to force retrieval
+	 * @returns int
+	 */
 	public function getHeight($force = false) {
 		if($this->_cache_height && !$force) {
 			return $this->_cache_height;
