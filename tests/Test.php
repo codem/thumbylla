@@ -49,7 +49,7 @@ class ThumborTest extends SapphireTest {
 
 	public function tearDown() {
 		parent::tearDown();
-		//$this->unlinkSampleImage();
+		$this->unlinkSampleImage();
 	}
 
 	private function unlinkSampleImage() {
