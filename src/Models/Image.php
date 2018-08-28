@@ -15,6 +15,8 @@ class Image extends SS_Image {
 
 	private static $table_name = "ThumborImage";
 
+	private static $default_classname = "SilverStripe\Assets\Image";
+
 	private $image_backend = null;
 
 	private $_cache_width = 0;//the width of the original image uploaded
@@ -29,6 +31,13 @@ class Image extends SS_Image {
 		}
 	}
 
+	/**
+	 * Ensure that the ClassName value saved is the original SS Image classname
+	 */
+	public function onBeforeWrite() {
+		parent::onBeforeWrite();
+		$this->ClassName = SS_Image::class;
+	}
 
 	/**
 	 * @returns object
