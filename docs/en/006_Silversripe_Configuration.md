@@ -3,13 +3,13 @@
 The module ships with the following annotated configuration.
 Copy the config and modify to your requirements:
 
-+ add backend(s)
-+ add protected backend(s)
-+ add a protected asset signing key and keep it safe
-+ add a salt and keep it safe
-+ add the Thumbor generation key from your thumbor server conf and keep it safe
-+ set https requirements (probably true)
-+ set an expiry time for protected asset URLs
+* add backend(s)
+* add protected backend(s)
+* add a protected asset signing key and keep it safe
+* add a salt and keep it safe
+* add the Thumbor generation key from your thumbor server conf and keep it safe
+* set https requirements (probably true)
+* set an expiry time for protected asset URLs
 
 You may also like to [tweak File Permissions](./002_File_Permissions.md) in case your web server runs into 403 errors accessing images.
 

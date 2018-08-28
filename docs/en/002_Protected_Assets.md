@@ -6,9 +6,9 @@ Public assets are available to anyone and are easily accessible to the Thumbor H
 
 Protected assets are available to those users with session data indicating that they can access the image provided. This poses a problem for the Thumbor HTTP Loader as it is "session-less".
 To allow the HTTP Loader to access protected images, a protected image backend is used for those images in the protected filesystem. It:
-+ Signs the image path e.g /assets/images/my_image.jpg with a signing_key
-+ Sets an expiry time on the URL request
-+ Signs the 'protected' host name which is then checked for validity during the grants stage.
+* Signs the image path e.g /assets/images/my_image.jpg with a signing_key
+* Sets an expiry time on the URL request
+* Signs the 'protected' host name which is then checked for validity during the grants stage.
 
 Direct requests to the image URL without any tokens provided will cause Silverstripe to do it's default session-based checking. This will always fail for the Thumbor HTTP loader.
 When the asset store receives a request for a protected image with tokens and expiry, it will check each in order and only allow the request if it has not expired and the tokens match.
@@ -32,9 +32,9 @@ protected_backends:
 A protected Thumbor server should be set up to act as the backend thumbor server for protected images. This separates concerns and allows you to set cache control headers and configuration separately to a public Thumbor server.
 
 The setup is very similar to a public Thumbor server with the following changes:
-+ The web server should set Cache-Control private headers and an expiry in the past
-+ The protected Thumbor server should set storage expiration to 0 seconds along with a max-age of 0
-+ The protected Thumbor server should have the storage and result_storage set to the relevant no_storage values. This stops Thumbor storing protected images in its cache(s),
+* The web server should set Cache-Control private headers and an expiry in the past
+* The protected Thumbor server should set storage expiration to 0 seconds along with a max-age of 0
+* The protected Thumbor server should have the storage and result_storage set to the relevant no_storage values. This stops Thumbor storing protected images in its cache(s),
 
 ## Example frontend web server config
 > Read this in conjunction with the Nginx_Supervisor Docs

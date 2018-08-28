@@ -9,7 +9,7 @@ sudo pip install tc_aws
 
 The AWS extension supports an S3 Loading bucket, a storage bucket and a result storage bucket.
 
-S3 communications [are handled via boto](http://boto3.readthedocs.io/en/latest/guide/configuration.html) and your AWS credentials can be stored in the standard places, such as ~/.aws/credentials:
+S3 communications [are handled via boto](https://boto3.readthedocs.io/en/latest/guide/configuration.html) and your AWS credentials can be stored in the standard places, such as ~/.aws/credentials:
 ```
 [default]
 aws_secret_access_key=xxxxxxxxxxxxxxxxxxxxx

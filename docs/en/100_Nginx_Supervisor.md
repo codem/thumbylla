@@ -32,7 +32,7 @@ sudo pip install thumbor pycurl
 
 ### Thumbor
 
-> A really good reference is the [Thumbor configuration documentation](http://thumbor.readthedocs.io/en/latest/configuration.html)
+> A really good reference is the [Thumbor configuration documentation](https://thumbor.readthedocs.io/en/latest/configuration.html)
 
 ```
 sudo mkdir /etc/thumbor
@@ -41,12 +41,12 @@ sudo thumbor-config > /etc/thumbor/my-thumbor.conf
 
 For the most basic configuration, modify the following values
 
-+ SECURITY_KEY: change this to something random and lengthy, it will be used to generate thumbnails. **Anyone who has the key can generate thumbnails.**
-+ ALLOW_UNSAFE_URL: change to ```False```
-+ HTTP_LOADER_DEFAULT_USER_AGENT: you can modify the user agent used to retrieve original files
-+ HTTP_LOADER_PROXY_HOST, HTTP_LOADER_PROXY_PORT: modify if you are behind a proxy
-+ FILE_STORAGE_ROOT_PATH: For basic setup, use file storage. This option sets the local location for result/thumbnail storage. Other storage and result storage options are available.
-+ ALLOWED_SOURCES: set domain values including wildcards, limiting image generation to images from these hosts/sources.
+* SECURITY_KEY: change this to something random and lengthy, it will be used to generate thumbnails. **Anyone who has the key can generate thumbnails.**
+* ALLOW_UNSAFE_URL: change to ```False```
+* HTTP_LOADER_DEFAULT_USER_AGENT: you can modify the user agent used to retrieve original files
+* HTTP_LOADER_PROXY_HOST, HTTP_LOADER_PROXY_PORT: modify if you are behind a proxy
+* FILE_STORAGE_ROOT_PATH: For basic setup, use file storage. This option sets the local location for result/thumbnail storage. Other storage and result storage options are available.
+* ALLOWED_SOURCES: set domain values including wildcards, limiting image generation to images from these hosts/sources.
 
 You can tweak other values as required.
 
@@ -80,7 +80,7 @@ Set up Nginx to proxy requests to the Thumbor server.
 
 ```
 # The Thumbor upstream
-# Reference: http://nginx.org/en/docs/http/ngx_http_upstream_module.html
+# Reference: https://nginx.org/en/docs/http/ngx_http_upstream_module.html
 upstream thumbor {
 	# these port numbers need to match --port=1110%(process_num)s in supervisor
 	server 127.0.0.1:11100;
