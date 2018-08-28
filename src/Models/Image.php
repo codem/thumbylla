@@ -29,6 +29,7 @@ class Image extends SS_Image {
 		}
 	}
 
+
 	/**
 	 * @returns object
 	 */
@@ -97,7 +98,6 @@ class Image extends SS_Image {
 	 * @return Object|DBField
 	 */
 	public function obj($fieldName, $arguments = [], $cache = false, $cacheName = null) {
-		$cache = false;
 		return parent::obj($fieldName, $arguments, false, $cacheName);
 	}
 
@@ -105,9 +105,19 @@ class Image extends SS_Image {
 		return $this;
 	}
 
-	protected function getFormattedImage() {
-		$args = func_get_args();
-		return $this->getImageBackend()->getFormattedImage($args);
+	/**
+	 * Overrides ImageManipulation trait
+	 */
+	public function manipulate($variant, $callback) {
+		return;
+	}
+
+	/**
+	 * Overrides ImageManipulation trait
+	 */
+	public function manipulateImage($variant, $callback)
+	{
+		return;
 	}
 
 	/**
@@ -249,25 +259,23 @@ class Image extends SS_Image {
 	 */
 
 	public function FlipVertical() {
-		$this->getFormattedImage('FlipVertical');
-		return $this;
+		return $this->getImageBackend()->getFormattedImage(['FlipVertical']);
 	}
 
 	public function FlipHorizontal() {
-		$this->getFormattedImage('FlipHorizontal');
-		return $this;
+		return $this->getImageBackend()->getFormattedImage(['FlipHorizontal']);
 	}
 
 	public function ScaleWidthFlipVertical($width) {
-		return $this->getFormattedImage('ScaleWidthFlipVertical', $width);
+		return $this->getImageBackend()->getFormattedImage(['ScaleWidthFlipVertical', $width]);
 	}
 
 	public function ScaleWidthFlipHorizontal($width) {
-		return $this->getFormattedImage('ScaleWidthFlipHorizontal', $width);
+		return $this->getImageBackend()->getFormattedImage(['ScaleWidthFlipHorizontal', $width]);
 	}
 
 	public function Original() {
-		return $this->getFormattedImage('Original');
+		return $this->getImageBackend()->getFormattedImage(['Original']);
 	}
 
 	// Predefined social media images
@@ -280,20 +288,19 @@ class Image extends SS_Image {
 	public function Social($provider, $key) {
 		$config = $this->getSocialProviderConfig($provider);
 		if(!empty($config[$key]['width']) && !empty($config[$key]['height'])) {
-			return $this->getFormattedImage('Fill', $config[$key]['width'], $config[$key]['height']);
+			return $this->getImageBackend()->getFormattedImage( ['Fill', $config[$key]['width'], $config[$key]['height'] ]);
 		} else {
 			return null;
 		}
 	}
 
 	// --- CORE silverstripe image thumbnailing methods --- ///
-	// --- TODO: use the ImageManipulation methods to build URLs for these via the backend ? --- //
 
 	/**
 	 * Return URL representing an image scaled to the provided width
 	 */
 	public function ScaleWidth($width) {
-		return $this->getFormattedImage('ScaleWidth', $width);
+		return $this->getImageBackend()->getFormattedImage(['ScaleWidth', $width]);
 	}
 
 	/**
@@ -309,14 +316,14 @@ class Image extends SS_Image {
 			if($original_width <= $width) {
 				$width = $original_width;
 			}
-			return $this->getFormattedImage('ScaleWidth', $width);
+			return $this->getImageBackend()->getFormattedImage(['ScaleWidth', $width]);
 	}
 
 	/**
 	 * Return URL representing an image resized/cropped to fill specified dimensions
 	 */
 	public function Fill($width, $height, $test = '') {
-		return $this->getFormattedImage('Fill', $width, $height);
+		return $this->getImageBackend()->getFormattedImage(['Fill', $width, $height]);
 	}
 
 	/**
@@ -361,7 +368,7 @@ class Image extends SS_Image {
 				$height_new = $height;
 			}
 
-			return $this->getFormattedImage('Fill', $width_new, $height_new);
+			return $this->getImageBackend()->getFormattedImage(['Fill', $width_new, $height_new]);
 	}
 
 	/**
@@ -378,7 +385,7 @@ class Image extends SS_Image {
 		if($original_height <= $height) {
 			return $this->Original();
 		}
-		return $this->getFormattedImage('Fill', $original_width, $height);
+		return $this->getImageBackend()->getFormattedImage(['Fill', $original_width, $height]);
 	}
 
 	/**
@@ -395,7 +402,7 @@ class Image extends SS_Image {
 			if($original_width <= $width) {
 				return $this->Original();
 			}
-			return $this->getFormattedImage('Fill', $width, $original_height);
+			return $this->getImageBackend()->getFormattedImage(['Fill', $width, $original_height]);
 	}
 
 	/**
@@ -406,7 +413,7 @@ class Image extends SS_Image {
 	 */
 	public function ScaleHeight($height) {
 		$original_height = $this->getHeight();
-		return $this->getFormattedImage('ScaleHeight', $height);
+		return $this->getImageBackend()->getFormattedImage(['ScaleHeight', $height]);
 	}
 
 	/**
@@ -423,7 +430,7 @@ class Image extends SS_Image {
 			if($original_height <= $height) {
 				return $this->Original();
 			}
-			return $this->getFormattedImage('ScaleHeight', $height);
+			return $this->getImageBackend()->getFormattedImage(['ScaleHeight', $height]);
 	}
 
 	/**
@@ -434,7 +441,7 @@ class Image extends SS_Image {
 	 * @return Codem\ThumboredImage
 	 */
 	public function ResizedImage($width, $height) {
-		return $this->getFormattedImage(__FUNCTION__, $width, $height);
+		return $this->getImageBackend()->getFormattedImage([__FUNCTION__, $width, $height]);
 	}
 
 	/**
@@ -448,7 +455,7 @@ class Image extends SS_Image {
 	 * @return Codem\ThumboredImage
 	 */
 	public function Pad($width, $height, $backgroundColor = 'FFFFFF', $transparencyPercent = 0) {
-		return $this->getFormattedImage('Pad', $width, $height, $backgroundColor, $transparencyPercent);
+		return $this->getImageBackend()->getFormattedImage(['Pad', $width, $height, $backgroundColor, $transparencyPercent]);
 	}
 
 	/**
@@ -458,11 +465,11 @@ class Image extends SS_Image {
 	 * @param integer $height The height to size within
 	 */
 	public function Fit($width, $height) {
-		return $this->getFormattedImage('Fit', $width, $height);
+		return $this->getImageBackend()->getFormattedImage(['Fit', $width, $height]);
 	}
 
 	public function FitMax($width, $height) {
-		return $this->getFormattedImage('FitMax', $width, $height);
+		return $this->getImageBackend()->getFormattedImage(['FitMax', $width, $height]);
 	}
 
 	/**
@@ -470,7 +477,7 @@ class Image extends SS_Image {
 	 * @todo provide a field to allow manual cropping
 	 */
 	public function CroppedFocusedImage($width, $height) {
-		return $this->getFormattedImage('Fill', $width, $height);
+		return $this->getImageBackend()->getFormattedImage(['Fill', $width, $height]);
 	}
 
 }
