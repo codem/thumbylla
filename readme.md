@@ -59,7 +59,7 @@ Best read the docs: https://thumbor.readthedocs.io/
 
 ## Signed URLs for protected assets
 
-See [Protected Assets](./docs/en/002_Protected_Assets.md)
+See [Protected Assets](docs/en/002_Protected_Assets.md)
 
 ## Image manipulation in templates
 
@@ -133,7 +133,7 @@ $TestImage.ManualCrop.Original
 
 ## Configuring a Thumbor Server
 
-[Check out the module docs here](.docs/en/000_Setup.md)
+[Check out the module docs here](docs/en/000_Setup.md)
 
 ## Silverstripe Configuration
 
