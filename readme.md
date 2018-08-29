@@ -99,7 +99,7 @@ For [Sharpen](https://github.com/thumbor/thumbor/wiki/Sharpen), adding ```$Image
 
 ## Configuring a Thumbor Server
 
-[Check out the module docs here](.docs/en/000_Setup.md)
+[Check out the module docs here](docs/en/000_Setup.md)
 
 ## Silverstripe Configuration
 
