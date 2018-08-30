@@ -1,6 +1,6 @@
 # Setup on AWS S3
 
-S3 is a great choice for result storage and/or storage, allowing you to store generated thumbnails outside a Silverstripe website's assets directory.
+S3 is a good choice for result storage and/or storage, allowing you to store generated thumbnails outside a Silverstripe website's assets directory.
 
 You will need to install the [Thumbor Community AWS extension](https://github.com/thumbor-community/aws) which can be done via PIP:
 ```
@@ -9,7 +9,7 @@ sudo pip install tc_aws
 
 The AWS extension supports an S3 Loading bucket, a storage bucket and a result storage bucket.
 
-S3 communications [are handled via boto](http://boto3.readthedocs.io/en/latest/guide/configuration.html) and your AWS credentials can be stored in the standard places, such as ~/.aws/credentials:
+S3 communications [are handled via boto](https://boto3.readthedocs.io/en/latest/guide/configuration.html) and your AWS credentials can be stored in the standard places, such as ~/.aws/credentials:
 ```
 [default]
 aws_secret_access_key=xxxxxxxxxxxxxxxxxxxxx

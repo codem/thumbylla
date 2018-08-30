@@ -1,6 +1,6 @@
 # Setup
 
-Thumbor set up is covered [elsewhere in Thumbor documentation](http://thumbor.readthedocs.io/en/latest/installing.html); it's best that you read that first.
+Thumbor set up is covered [elsewhere in Thumbor documentation](https://thumbor.readthedocs.io/en/latest/installing.html); it's best that you read that first.
 
 You Thumbor setup should contain:
 
