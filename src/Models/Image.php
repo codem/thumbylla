@@ -131,7 +131,7 @@ class Image extends SS_Image {
 
 	/**
 	 * As filters are chainable, getting multiple manipulations in a template on the same image
-	 * can result in filters being retained for the 2nd image.
+	 * can result in filters being retained for another manipulation of the same image
 	 *
 	 * Example with Restart() in a template
 	 * $TestImage.Pad(500,300, 'fc0') - /fit-in/500x300/filters:fill(fc0)/_URL_
@@ -148,8 +148,15 @@ class Image extends SS_Image {
 	 */
 	public function Restart() {
 		// Reset thumbor_url
-		$backend = $this->getImageBackend()->Restart();
+		$backend = $this->getImageBackend()->ResetFilters();
 		return $this;
+	}
+
+	/**
+	 * Alias for Restart()
+	 */
+	public function ResetFilters() {
+		return $this->Restart();
 	}
 
 	/**

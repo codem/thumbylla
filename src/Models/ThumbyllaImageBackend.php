@@ -181,7 +181,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	/**
 	 * Reset the current thumbor_url - see {@link Codem\Thumbor\Image::Restart()}
 	 */
-	public function Restart() {
+	public function ResetFilters() {
 		$this->thumbor_url = $this->generateUrlInstance();
 	}
 
