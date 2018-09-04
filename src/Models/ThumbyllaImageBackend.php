@@ -29,6 +29,8 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	private $halign = "center";
 	private $valign = "middle";
 
+	private $quality;
+
 	/**
 	 * @var AssetContainer
 	 */
@@ -474,12 +476,28 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	public function writeTo($path)  {}
 
 	/**
-	 * setQuality - not implemented
+	 * setQuality - if set, will modify the quality in a filter
 	 *
 	 * @param int $quality
 	 * @return void
 	 */
-	public function setQuality($quality)  {}
+	public function setQuality($quality)  {
+		$quality = (int)$quality;
+		if($quality < 1 || $quality > 100) {
+			return $this;
+		}
+		$this->quality = $quality;
+		$this->Filter(["quality", $quality]);// setting a quality also ads a filter
+		return $this;
+	}
+
+	/**
+	 * @return int
+	 */
+	public function getQuality()
+	{
+			return $this->quality;
+	}
 
 	/**
 	 * setImageResource - not implemented
