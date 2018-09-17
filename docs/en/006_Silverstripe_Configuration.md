@@ -11,7 +11,7 @@ Copy the config and modify to your requirements:
 * set https requirements (probably true)
 * set an expiry time for protected asset URLs
 
-You may also like to [tweak File Permissions](./002_File_Permissions.md) in case your web server runs into 403 errors accessing images.
+You may also like to [tweak File Permissions](./003_File_Permissions.md) in case your web server runs into 403 errors accessing images.
 
 ```
 ---

@@ -4,13 +4,13 @@ Silverstripe 4.x ships with a new public/protected assets system.
 
 Public assets are available to anyone and are easily accessible to the Thumbor HTTP loader, as they are delivered via the web server.
 
-Protected assets are available to those users with session data indicating that they can access the image provided. This poses a problem for the Thumbor HTTP Loader as it is "session-less".
+Protected assets are available to those users with a session indicating that they can access the image provided. This poses a problem for the Thumbor HTTP Loader as it is "session-less".
 To allow the HTTP Loader to access protected images, a protected image backend is used for those images in the protected filesystem. It:
 * Signs the image path e.g /assets/images/my_image.jpg with a signing_key
 * Sets an expiry time on the URL request
 * Signs the 'protected' host name which is then checked for validity during the grants stage.
 
-Direct requests to the image URL without any tokens provided will cause Silverstripe to do it's default session-based checking. This will always fail for the Thumbor HTTP loader.
+Direct requests to the image URL without any tokens provided will cause Silverstripe to do its default session-based checking. This will always fail for the Thumbor HTTP loader.
 When the asset store receives a request for a protected image with tokens and expiry, it will check each in order and only allow the request if it has not expired and the tokens match.
 
 The configuration for this is:
@@ -29,7 +29,7 @@ protected_backends:
 
 ## Set up a 'protected' Thumbor backend
 
-A protected Thumbor server should be set up to act as the backend thumbor server for protected images. This separates concerns and allows you to set cache control headers and configuration separately to a public Thumbor server.
+A protected Thumbor server should be set up to act as the back-end Thumbor server for protected images. This separates concerns and allows you to set cache control headers and configuration separately to a Thumbor server generating publicly available images.
 
 The setup is very similar to a public Thumbor server with the following changes:
 * The web server should set Cache-Control private headers and an expiry in the past
@@ -80,4 +80,5 @@ RESULT_STORAGE_EXPIRATION_SECONDS = 0
 MAX_AGE = 0
 ```
 
-The config values force Thumbor to resample the image every time in memory. You can modify them as required for your use case. For instance, if you are OK with storing results for a longer time in cache add a ```RESULT_STORAGE``` with a required expiration.
+The config values force Thumbor to resample the image every time in memory. You can modify them as required for your use case.
+For instance, if you are OK with storing results for a longer time in cache add a ```RESULT_STORAGE``` with a required expiration.

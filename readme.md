@@ -172,6 +172,9 @@ Codem\Thumbor\Config:
     - 'img3.cdn.example.com'
 ```
 
+## Documentation
+[Documentation is updated from time-to-time](docs/en/readme.md)
+
 ## Known Issues + Issue Tracking
 
 Please use the Github Issue Tracker to ask questions/report bugs.

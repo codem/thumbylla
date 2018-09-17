@@ -30,6 +30,23 @@ sudo pip install thumbor pycurl
 
 ## Configuration
 
+The end goal is something like this:
+```
+# Base server config to load /etc/nginx/sites-enabled/*.conf
+/etc/nginx/nginx.conf
+# Nginx config for site proxying requests to Thumbor server
+/etc/nginx/sites-enabled/my-thumbor-frontend.conf
+
+# Supervisor to manage Thumbor, loading /etc/supervisor/conf.d/*.conf
+/etc/supervisor/supervisord.conf
+# Supervisor thumbor program loading  /etc/thumbor/my-thumbor.conf
+/etc/supervisor/conf.d/my-thumbor.conf
+
+# Thumbor config
+/etc/thumbor/my-thumbor.conf
+```
+Use supervisor to start/restart/reload the Thumbor daemon(s)
+
 ### Thumbor
 
 > A really good reference is the [Thumbor configuration documentation](https://thumbor.readthedocs.io/en/latest/configuration.html)
@@ -46,7 +63,9 @@ For the most basic configuration, modify the following values
 * HTTP_LOADER_DEFAULT_USER_AGENT: you can modify the user agent used to retrieve original files
 * HTTP_LOADER_PROXY_HOST, HTTP_LOADER_PROXY_PORT: modify if you are behind a proxy
 * FILE_STORAGE_ROOT_PATH: For basic setup, use file storage. This option sets the local location for result/thumbnail storage. Other storage and result storage options are available.
-* ALLOWED_SOURCES: set domain values including wildcards, limiting image generation to images from these hosts/sources.
+* ALLOWED_SOURCES: set domain values including wildcards, limiting image generation to images from these hosts/sources. Example ```ALLOWED_SOURCES = ['.+.example.com']``` to only load only images from *.example.com
+
+
 
 You can tweak other values as required.
 
@@ -72,7 +91,7 @@ startretries=3
 
 Where ```username``` is a user that can write to the FILE_STORAGE_ROOT_PATH. It should *not* be root.
 
-Restart supervisor, check for running processes, look in supervisor logs for errors if there are issues.
+Reload/start the program via ```supervisorctl```, check for running processes, look in supervisor logs for errors if there are issues.
 
 ### Nginx
 
@@ -144,7 +163,7 @@ server {
 
 ### Options
 
-Your ```server_name``` settings are important here, for instance in this setup you could limit your server names to a restricted set e.g ```image1.cdn.example.com```, ```image2.cdn.example.com``` rather than a wildcard.
+Your ```server_name``` settings are important here, for instance in this setup you could limit your server names to a restricted set e.g ```server_name image1.cdn.example.com image2.cdn.example.com;``` rather than a wildcard.
 
 Test your configuration ```sudo nginx -t``` and reload nginx.
 
