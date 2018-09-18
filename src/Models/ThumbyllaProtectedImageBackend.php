@@ -46,7 +46,7 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
    * When a protected image is served, the Thumbor server must request the image within this amount of time
    */
   protected static function getExpiry() {
-		$expiry = Config::inst()->get(ThumborConfig::class, 'expiry');
+		$expiry = Config::inst()->get(ThumborConfig::class, 'expiry_time');
     if(!$expiry) {
       $expiry = 10;
     }
