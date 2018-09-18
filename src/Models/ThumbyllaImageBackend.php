@@ -146,6 +146,8 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 		$image_url = $this->container->getAbsoluteURL();
 		$this->signURL($backend_host, $image_url);
 
+		$image_url = urlencode($image_url);
+		
 		$inst = ThumborUrlBuilder::construct($protocol . $backend_host, $secret, $image_url);
 		return $inst;
 	}

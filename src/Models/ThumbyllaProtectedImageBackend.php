@@ -98,7 +98,7 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
 									. $parts['host']
 									. (!empty($parts['port']) ? ":" . $parts['port'] : "")
 									. $parts['path']
-									. rawurlencode("?" . $query);
+									. "?" . $query;
 		/**
 		 * the image URL thumbor loads now looks like this:
 		 * http://protected.image.url?a=<token>&b=<expiry>
