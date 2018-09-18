@@ -6,7 +6,7 @@ use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Forms\Fieldlist;
 
 /**
- * This {@link \DataExtension} provides storage for manual cropping via {@link Codem\Thumbor\ManualCropField}
+ * This {@link DataExtension} provides storage for manual cropping via {@link Codem\Thumbor\ManualCropField}
  */
 class ManualCropImageExtension extends DataExtension {
 

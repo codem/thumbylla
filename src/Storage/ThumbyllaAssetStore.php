@@ -1,6 +1,6 @@
 <?php
 namespace Codem\Thumbor;
-
+use Codem\Thumbor\Config as ThumborConfig;
 use League\Flysystem\Filesystem;
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
 use SilverStripe\Control\Controller;
@@ -8,6 +8,8 @@ use SilverStripe\Core\Config\Configurable;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Core\Config\Config;
 use SilverStripe\Core\Injector\Injector;
+use Exception;
+use DateTime;
 
 /**
  * Asset store based on flysystem Filesystem as a backend
@@ -40,32 +42,32 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
         }
 
         if(empty($query['a'])) {
-          throw new \Exception("No token provided in query");
+          throw new Exception("No token provided in query");
         }
         if(empty($query['h'])) {
-          throw new \Exception("No host token provided in query");
+          throw new Exception("No host token provided in query");
         }
         if(empty($query['b'])) {
-          throw new \Exception("No expiry provided in query");
+          throw new Exception("No expiry provided in query");
         } else {
           // check expiry timestamp
           $expiry = (float)$query['b'];
           $now = microtime(true);
           $diff = $now - $expiry;
           if($diff > 0) {
-            throw new \Exception("URL has expired");
+            throw new Exception("URL has expired");
           }
         }
 
         $uri = $_SERVER['REQUEST_URI'];
         $parts = parse_url($uri);
         if(empty($parts['path'])) {
-          throw new \Exception("Not path provided in uri:{$uri}");
+          throw new Exception("Not path provided in uri:{$uri}");
         }
         $data = $parts['path'] . $query['b'];
         $token = ThumbyllaProtectedImageBackend::signData($data);
         if($token != $query['a']) {
-          throw new \Exception("Token mismatch");
+          throw new Exception("Token mismatch");
         }
 
         /**
@@ -73,9 +75,9 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
          * A host token should be present and match one of the currently configired (signed) protected backends
          * This ensures that protected image requests come via a protected Thumbor server host
          */
-        $protected_backends = Config::inst()->get('Codem\Thumbor\Config', 'protected_backends');
+        $protected_backends = Config::inst()->get(ThumborConfig::class, 'protected_backends');
         if(!$protected_backends || empty($protected_backends) || !is_array($protected_backends)) {
-          throw new \Exception("No protected servers defined");
+          throw new Exception("No protected servers defined");
         } else {
           $host_token = $query['h'];
           $host_token_match = false;
@@ -88,13 +90,13 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
           }
 
           if(!$host_token_match) {
-            throw new \Exception("Host token mismatch");
+            throw new Exception("Host token mismatch");
           }
         }
         // token matches AND is not expired, this protected image URL can be viewed
         return true;
       }
-    } catch (\Exception $e) {
+    } catch (Exception $e) {
       syslog(LOG_INFO, "FAILED: {$e->getMessage()}");
       return false;
     }
@@ -116,11 +118,11 @@ class ThumbyllaAssetStore extends FlysystemAssetStore {
        * Set up headers for protected assets
        * Tell caches that we do not want these cached
        */
-      $expires = new \DateTime();
+      $expires = new DateTime();
       $expires->modify('-1 hour');
       $headers = [
         'Cache-Control' => 'no-cache, no-store, must-revalidate, max-age=0, s-maxage=0',
-        'Expires' => $expires->format(\DateTime::RFC822)
+        'Expires' => $expires->format(DateTime::RFC822)
       ];
       foreach ($headers as $header => $value) {
         $response->addHeader($header, $value);

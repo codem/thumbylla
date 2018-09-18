@@ -1,5 +1,6 @@
 <?php
 namespace Codem\Thumbor;
+use Codem\Thumbor\Config as ThumborConfig;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
 use SilverStripe\Assets\Image As SS_Image;
@@ -10,6 +11,7 @@ use SilverStripe\Assets\InterventionBackend;
 use SilverStripe\Core\Flushable;
 use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
+use Exception;
 
 /**
  * A Protected Image Backend for Thumbor-based image handling, replacing the InterventionBackend
@@ -22,9 +24,9 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
    * @returns string
    */
   protected function pickBackendHost() {
-    $backends = Config::inst()->get('Codem\Thumbor\Config', 'protected_backends');
+    $backends = Config::inst()->get(ThumborConfig::class, 'protected_backends');
     if(!$backends || empty($backends) || !is_array($backends)) {
-      throw new \Exception("No protected servers defined");
+      throw new Exception("No protected servers defined");
     }
     $key = array_rand($backends, 1);
     $server = $backends[$key];
@@ -36,7 +38,7 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
 	 * @returns string
 	 */
 	protected static function getProtectedSigningKey() {
-		return Config::inst()->get('Codem\Thumbor\Config', 'signing_key');
+		return Config::inst()->get(ThumborConfig::class, 'signing_key');
 	}
 
   /**
@@ -44,7 +46,7 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
    * When a protected image is served, the Thumbor server must request the image within this amount of time
    */
   protected static function getExpiry() {
-		$expiry = Config::inst()->get('Codem\Thumbor\Config', 'expiry');
+		$expiry = Config::inst()->get(ThumborConfig::class, 'expiry');
     if(!$expiry) {
       $expiry = 10;
     }
@@ -113,9 +115,9 @@ class ThumbyllaProtectedImageBackend extends ThumbyllaImageBackend {
 	public static function signData($data) {
 		$key = self::getProtectedSigningKey();
 		if(!$key) {
-			throw new \Exception("Cannot sign if no signing_key provided in config");
+			throw new Exception("Cannot sign if no signing_key provided in config");
 		}
-    $salt = (string)Config::inst()->get('Codem\Thumbor\Config', 'salt');
+    $salt = (string)Config::inst()->get(ThumborConfig::class, 'salt');
 		$token = hash_hmac ( "sha256" , $data . $salt, $key, false );
     return $token;
 	}

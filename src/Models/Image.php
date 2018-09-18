@@ -6,6 +6,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Image As SS_Image;
 use SilverStripe\Assets\Storage\AssetStore;
 use Intervention\Image\ImageManagerStatic;
+use Exception;
 
 /**
  * A Thumbor image object that extends Image and overrides various methods
@@ -70,7 +71,7 @@ class Image extends SS_Image {
 			$width = $im->getWidth();
 			$this->_cache_width = $width;
 			return $this->_cache_width;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 
 		}
 		return 0;
@@ -92,7 +93,7 @@ class Image extends SS_Image {
 			$height = $im->getHeight();
 			$this->_cache_height = $height;
 			return $this->_cache_height;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 
 		}
 		return 0;

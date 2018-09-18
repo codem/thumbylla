@@ -7,6 +7,7 @@ use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Assets\Storage\DBFile;
 use SilverStripe\Core\Config\Configurable;
 use GuzzleHttp\Psr7\Response as GuzzleResponse;
+use Exception;
 
 /**
  * Generate thumbnails and thumbnail links using Thumbor backend
@@ -43,7 +44,7 @@ class ThumbnailGenerator extends BaseThumbnailGenerator {
         try {
           $response = $backend->getRemoteResponse($url);
           if(!($response instanceof GuzzleResponse)) {
-            throw new \Exception("Failed to get response from a GET - " . get_class($response) );
+            throw new Exception("Failed to get response from a GET - " . get_class($response) );
           }
           $body = $response->getBody()->getContents();
           $body = base64_encode($body);
@@ -56,7 +57,7 @@ class ThumbnailGenerator extends BaseThumbnailGenerator {
               $content_type ? $content_type : $file->getMimeType(),
               $body
           );
-        } catch (\Exception $e) {}
+        } catch (Exception $e) {}
         return null;
       }
   }

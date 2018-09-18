@@ -1,5 +1,6 @@
 <?php
 namespace Codem\Thumbor;
+use Codem\Thumbor\Config as ThumborConfig;
 use Thumbor\Url As ThumborUrl;
 use Thumbor\Url\Builder As ThumborUrlBuilder;
 use SilverStripe\Assets\Image As SS_Image;
@@ -9,6 +10,7 @@ use SilverStripe\Core\Config\Config;
 use SilverStripe\Assets\Storage\AssetStore;
 use SilverStripe\Assets\Flysystem\FlysystemAssetStore;
 use GuzzleHttp\Client;
+use Exception;
 
 /**
  * An Image Backend for Thumbor-based image handling, replacing the InterventionBackend
@@ -70,7 +72,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 			];
 			$response = $client->request($method, $url, $options);
 			return $response;
-		} catch (\Exception $e) {
+		} catch (Exception $e) {
 		}
 		return null;
 	}
@@ -91,9 +93,9 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	 * @returns string
 	 */
 	protected function pickBackendHost() {
-		$backends = Config::inst()->get('Codem\Thumbor\Config', 'backends');
+		$backends = Config::inst()->get(ThumborConfig::class, 'backends');
 		if(!$backends || empty($backends) || !is_array($backends)) {
-			throw new \Exception("No servers defined");
+			throw new Exception("No servers defined");
 		}
 		$key = array_rand($backends, 1);
 		$server = $backends[$key];
@@ -105,7 +107,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	 */
 	protected function getProtocol() {
 		$protocol = "http";
-		$use_https = Config::inst()->get('Codem\Thumbor\Config', 'use_https');
+		$use_https = Config::inst()->get(ThumborConfig::class, 'use_https');
 		if($use_https) {
 			$protocol = "https";
 		}
@@ -118,7 +120,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	 * @returns string
 	 */
 	public function getSecretKey() {
-		return Config::inst()->get('Codem\Thumbor\Config', 'thumbor_generation_key');
+		return Config::inst()->get(ThumborConfig::class, 'thumbor_generation_key');
 	}
 
 	/**
@@ -126,7 +128,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 	 * @returns string
 	 */
 	protected static function getProtectedSigningKey() {
-		throw new \Exception("Public backend doesn't need to sign URLs");
+		throw new Exception("Public backend doesn't need to sign URLs");
 	}
 
 	/**
@@ -420,7 +422,7 @@ class ThumbyllaImageBackend implements SS_Image_Backend {
 				// handle original case (e.g ManualCrop with no resize)
 				break;
 			default:
-				throw new \Exception("Unhandled format {$format}");
+				throw new Exception("Unhandled format {$format}");
 				break;
 		}
 
