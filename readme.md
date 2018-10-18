@@ -114,13 +114,13 @@ Compare:
 ```
 $TestImage.Restart().Pad(500,300, 'fc0')
 $TestImage.Restart().Align('left','top').Fill(160,160)
-````
+```
 With:
 ```
 $TestImage.Pad(500,300, 'fc0')
 // this version will retain the Pad filter
 $TestImage.Align('left','top').Fill(160,160)
-````
+```
 
 #### Filters that need an extra command
 
@@ -143,33 +143,66 @@ $TestImage.ManualCrop.Original
 
 ## Silverstripe Configuration
 
-This example config shows a basic setup. You'll need to have a running Thumbor server before enabling the image Injector.
+The module ships with the configuration to handle image manipulation via Thumbor **turned off**. This allows you to switch back to the default Silverstripe image handling by removing project configuration.
+
+If you view the module Yaml config, a number of configuration options are commented out, use these in your own project configuration. To use the module, create the configuration in your own project Yaml, based on the module configuration:
+
+The below example config shows a basic setup. You *will* need to have a running Thumbor server before enabling the configuration.
 
 ```
 ---
 Name: local_thumbor_config
 After:
-  - 'thumbor_config'
+  - '#thumbor_config'
 ---
-# use our image class
-Injector:
-  Image:
-    class: 'Codem\Thumbor\Image'
 # Example config for creating images
 Codem\Thumbor\Config:
-  # from your thumbor.conf - the SECURITY_KEY value
-  thumbor_generation_key: 'your_thumbor_generation_key'
-    # the key used to sign protected image urls, best to not use the generation key above
-  signing_key: 'a >= 64 character key used to sign protected image urls'
-  # true if using https
+  # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
+  thumbor_generation_key: 'xxxxxx'
+  # for signing tokens for protected images, make it complex
+  signing_key: 'xxx'
+  salt: 'a salt'
   use_https : false
-  # if serving images off a directory on the backends
+  # protected image expiry time (s)
+  expiry_time: 2
+  # if serving off a directory
   backend_path : ''
-  # list all backends here, as many as you want
+  # list all backends you have configured here, as many as you want, the module will pick one at random
   backends:
     - 'img1.cdn.example.com'
     - 'img2.cdn.example.com'
     - 'img3.cdn.example.com'
+  protected_backends:
+    - 'protected.example.com'
+---
+Name: local_thumbor_injection
+After:
+  - '#thumbor_injection'
+---
+SilverStripe\Core\Injector\Injector:
+  SilverStripe\Assets\Image:
+    class: 'Codem\Thumbor\Image'
+  SilverStripe\Assets\Image_Backend:
+    class: Codem\Thumbor\ThumbyllaImageBackend
+  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.graphql:
+    class: Codem\Thumbor\ThumbnailGenerator
+  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
+    class: Codem\Thumbor\ThumbnailGenerator
+  SilverStripe\Assets\Storage\AssetStore:
+    class: Codem\Thumbor\ThumbyllaAssetStore
+---
+Name: local_thumbor_mapping_config
+After:
+  - '#thumbor_mapping_config'
+---
+# reset image handling classes
+SilverStripe\Assets\File:
+  class_for_file_extension:
+    'jpg': 'Codem\Thumbor\Image'
+    'jpeg': 'Codem\Thumbor\Image'
+    'gif': 'Codem\Thumbor\Image'
+    'png': 'Codem\Thumbor\Image'
+    'webp': 'Codem\Thumbor\Image'
 ```
 
 ## Documentation
@@ -188,7 +221,7 @@ If you want to build your own you will need Node and Yarn, then:
 $ cd vendor\codem\thumbylla
 $ yarn install
 ```
-You can then run ```yarn run build`` or ```yarn run watch```, for instance.
+You can then run ```yarn run build``` or ```yarn run watch```, for instance.
 
 
 ### Licence

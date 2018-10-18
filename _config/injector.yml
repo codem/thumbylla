@@ -10,15 +10,15 @@ After:
   - '#assetadminfield'
   - '#assetsflysystem'
 ---
-# Use the Thumbor backend
-SilverStripe\Core\Injector\Injector:
-  SilverStripe\Assets\Image:
-    class: 'Codem\Thumbor\Image'
-  SilverStripe\Assets\Image_Backend:
-    class: Codem\Thumbor\ThumbyllaImageBackend
-  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.graphql:
-    class: Codem\Thumbor\ThumbnailGenerator
-  SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
-    class: Codem\Thumbor\ThumbnailGenerator
-  SilverStripe\Assets\Storage\AssetStore:
-    class: Codem\Thumbor\ThumbyllaAssetStore
+# To use the Thumbor module to serve images add the below to your project yaml, after the module is configured
+# SilverStripe\Core\Injector\Injector:
+#   SilverStripe\Assets\Image:
+#     class: 'Codem\Thumbor\Image'
+#   SilverStripe\Assets\Image_Backend:
+#     class: Codem\Thumbor\ThumbyllaImageBackend
+#   SilverStripe\AssetAdmin\Model\ThumbnailGenerator.graphql:
+#     class: Codem\Thumbor\ThumbnailGenerator
+#   SilverStripe\AssetAdmin\Model\ThumbnailGenerator.assetadmin:
+#     class: Codem\Thumbor\ThumbnailGenerator
+#   SilverStripe\Assets\Storage\AssetStore:
+#     class: Codem\Thumbor\ThumbyllaAssetStore

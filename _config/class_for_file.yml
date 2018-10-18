@@ -1,0 +1,19 @@
+---
+Name: thumbor_mapping_config
+After:
+  - '#assetsimage'
+  - '#assetscore'
+  - '#assetadmingraphql-dependencies'
+  - '#assetadminthumbnails'
+  - '#assetsfieldtypes'
+  - '#assetadmin'
+  - '#assetadminfield'
+---
+# In your project configuration, apply the following configuration
+# SilverStripe\Assets\File:
+#   class_for_file_extension:
+#     'jpg': 'Codem\Thumbor\Image'
+#     'jpeg': 'Codem\Thumbor\Image'
+#     'gif': 'Codem\Thumbor\Image'
+#     'png': 'Codem\Thumbor\Image'
+#     'webp': 'Codem\Thumbor\Image'

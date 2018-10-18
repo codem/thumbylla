@@ -9,7 +9,7 @@ After:
   - '#assetadmin'
   - '#assetadminfield'
 ---
-# Example config for creating images
+# Example configuration for creating images
 Codem\Thumbor\Config:
   # from /etc/thumbor/thumbor.conf (MY_SECURE_KEY is the default, you shouldn't use this)
   thumbor_generation_key: 'override_this_in_your_project'
@@ -21,27 +21,10 @@ Codem\Thumbor\Config:
   expiry_time: 10
   # if serving off a directory
   backend_path : ''
-  # list all backends here, as many as you want
+  # In your project configuration, set your own backends
   # backends:
   #  - 'cdn1.example.com'
+  # And some protected backends
   # Protected backends are used to serve protected assets
   # protected_backends:
   #  - 'protected1.example.com'
----
-Name: thumbor_mapping_config
-After:
-  - '#assetsimage'
-  - '#assetscore'
-  - '#assetadmingraphql-dependencies'
-  - '#assetadminthumbnails'
-  - '#assetsfieldtypes'
-  - '#assetadmin'
-  - '#assetadminfield'
----
-SilverStripe\Assets\File:
-  class_for_file_extension:
-    'jpg': 'Codem\Thumbor\Image'
-    'jpeg': 'Codem\Thumbor\Image'
-    'gif': 'Codem\Thumbor\Image'
-    'png': 'Codem\Thumbor\Image'
-    'webp': 'Codem\Thumbor\Image'

@@ -1,6 +1,7 @@
 ---
 Name: thumbor_extensions
 ---
+# These extensions provide the cropping field in the asset admin
 SilverStripe\Assets\File:
   extensions:
     - 'Codem\Thumbor\ManualCropImageExtension'
