@@ -371,11 +371,11 @@ class Image extends SS_Image {
 			// Compare current and destination aspect ratios
 			$image_ratio = $original_width / $original_height;
 			$crop_ratio = $width / $height;
-			if ($crop_ratio < $image_ratio && $currentHeight < $height) {
+			if ($crop_ratio < $image_ratio && $original_height < $height) {
 				// Crop off sides
 				$width_new = round($original_height * $crop_ratio);
 				$height_new = $original_height;
-			} elseif ($currentWidth < $width) {
+			} elseif ($original_width < $width) {
 				// Crop off top/bottom
 				$width_new = $original_width;
 				$height_new = round($original_width / $crop_ratio);
